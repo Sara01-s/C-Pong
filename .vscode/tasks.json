@@ -1,0 +1,32 @@
+{
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "Build C OpenGL",
+            // Put your compiler's path here
+            "command": "C:\\msys64\\mingw64\\bin\\gcc.exe",
+            "args": [
+                "-I${workspaceFolder}\\deps\\include",
+                "-fdiagnostics-color=always",
+                "-g",
+                "${workspaceFolder}/src/main.c",
+                "-o",
+                "-L${workspaceFolder}\\deps\\libs",
+                "l${workspaceFolder}\\deps\\libs\\glew32",
+                "l${workspaceFolder}\\deps\\libs\\glfw3",
+                "${workspaceFolder}\\main.exe"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+        }
+    ],
+    "version": "2.0.0"
+}

@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+    ],
+    "settings": {
+        "files.associations": {
+            "*.cpp": "cpp",
+            "glfw3.h": "c",
+            "glew.h": "c",
+            "functional": "c"
+        }
+    }
+}

@@ -7,29 +7,42 @@ src_dir     = "src"
 include_dir = "deps/include"
 libs_dir    = "deps/libs"
 
-libraries = ["glfw3", "glew32s", "opengl32", "gdi32"]
+def get_dir(dir: str) -> str:
+    return f"{os.path.abspath(dir)}"
+
+def get_file(dir: str, file: str) -> str:
+    return os.path.join(get_dir(dir), file)
+
+libraries = ["glew32", "glfw3dll", "opengl32", "gdi32"]
 
 def main():
+
     # Compile
     compile_command = [
         "gcc",
         "-c",
-        f"{os.path.abspath(src_dir)}/{main_name}",
+        get_file(src_dir, main_name),
         "-I",
-        os.path.abspath(include_dir),
+        get_dir(include_dir),
         "-I",
-        f"{os.path.abspath(include_dir)}/GL",
+        get_dir(f"{include_dir}/GL"),
         "-I",
-        f"{os.path.abspath(include_dir)}/GLFW",
+        get_dir(f"{include_dir}/GLFW"),
         "-o",
         "main.o"
     ]
 
+    print("[INFO] Compiling...")
+    print("[INFO] Executing command:")
+    print(' '.join(compile_command).__add__('\n'))
+
     compile_result = subprocess.call(compile_command)
 
     if compile_result != 0:
-        print("Compilation Error, linking stopped.")
+        print("[ERROR] Compilation Error, linking stopped.")
         return
+
+    print("[INFO] Success.\n")
 
     # Link
     link_command = [
@@ -37,20 +50,23 @@ def main():
         "main.o",
         "-o",
         file_name,
-        "-L",
-        libs_dir,
+        f"-L{get_dir(libs_dir)}",
     ]
 
     for lib in libraries:
         link_command.append(f"-l{lib}")
 
+    print("[INFO] Linking...")
+    print("[INFO] Executing command:")
+    print(' '.join(link_command).__add__('\n'))
+
     link_result = subprocess.call(link_command)
 
     if link_result == 0:
-        print("Compilation Succeed.")
+        print("[INFO] Compilation Succeed.")
         os.remove("main.o")
     else:
-        print("Linking Error.")
+        print("[ERROR] Linking Error.")
 
 if __name__ == "__main__":
     main()
