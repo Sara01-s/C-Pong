@@ -11,17 +11,48 @@
 
 const unsigned long long MAX_VERTICES = 1024ULL; /* 1 kilo byte */
 
-vec2 player_1_position;
-vec2 player_2_position;
+vec2 player_1_input_direction   = GLM_VEC2_ZERO_INIT;
+vec2 player_1_position          = GLM_VEC2_ZERO_INIT;
 
-void process_input(GLFWwindow* window) {
+vec2 player_2_input_direction   = GLM_VEC2_ZERO_INIT;
+vec2 player_2_position          = GLM_VEC2_ZERO_INIT;
+
+void process_input(GLFWwindow* window, double delta_time) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE)) {
         glfwSetWindowShouldClose(window, true);
     }
 
-    if (glfwGetKey(window, GLFW_KEY_UP)) {
-        log_info("PRESIONANDO ARRIBA");
+    /* player 1 input */
+    bool is_up_1 = false;
+    if ((is_up_1 = glfwGetKey(window, GLFW_KEY_W)) || (is_up_1 != glfwGetKey(window, GLFW_KEY_S))) {
+        float increment = is_up_1 ? 0.1f : -0.1f;
+
+        player_1_input_direction[1] += increment;
+        glm_vec2_clamp(player_1_input_direction, -1.0f, 1.0f);
+
+        printf("p1 y: %.1f\n", player_1_input_direction[1]);
     }
+    else
+        player_1_input_direction[1] = 0.0f;
+
+    vec2 player_1_input_direction_delta;
+    glm_vec2_scale(player_1_input_direction, delta_time, player_1_input_direction_delta);
+    glm_vec2_addadd(player_1_position, player_1_input_direction_delta, player_1_position);
+
+
+    /* player 2 input */
+    bool is_up_2 = false;
+    if ((is_up_2 = glfwGetKey(window, GLFW_KEY_UP)) || (is_up_2 != glfwGetKey(window, GLFW_KEY_DOWN))) {
+        float increment = is_up_2 ? 0.1f : -0.1f;
+
+        player_2_input_direction[1] += increment;
+        glm_vec2_clamp(player_2_input_direction, -1.0f, 1.0f);
+        printf("p2 y: %.1f\n", player_2_input_direction[1]);
+    }
+    else
+        player_2_input_direction[1] = 0.0f;
+
+
 }
 
 int main(void) {
@@ -42,6 +73,10 @@ int main(void) {
 
     glfwSwapInterval(1);    /* 1 means VSync */
     glfwMakeContextCurrent(window);
+    int screen_width = 0;
+    int screen_height = 0;
+    glfwGetMonitorWorkarea(glfwGetPrimaryMonitor(), NULL, NULL, &screen_width, &screen_height);
+    glfwSetWindowPos(window, screen_width / 6, screen_height / 6);
 
     if (glewInit() != GLEW_OK) {
         fprintf(stderr, "Failed to initialize GLEW\n");
@@ -147,18 +182,19 @@ int main(void) {
     double delta_time           = 0.0;
     double last_frame_time      = 0.0;
 
+
     /* Game loop */
     while (!glfwWindowShouldClose(window)) {
-
-        process_input(window);
-
+        
+        /* Time update */
         current_frame_time  = glfwGetTime();
         delta_time          = current_frame_time - last_frame_time;
         last_frame_time     = current_frame_time;
 
+        process_input(window, delta_time);
+
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT));
 
-        glm_vec2_add(player_1_position, (vec2) { delta_time, 0.0f }, player_1_position);
 
         /* Dinamically set vertex buffer data */
         /* Squares */

@@ -13,20 +13,15 @@
 #define V Y
 
 void vertex_set_position(Vertex* vertex, vec2 position) {
-    vertex->position[X] = position[X];
-    vertex->position[Y] = position[Y];
+    glm_vec2_copy(position, vertex->position);
 }
 
 void vertex_set_color(Vertex* vertex, vec4 color) {
-    vertex->color[R] = color[R];
-    vertex->color[G] = color[G];
-    vertex->color[B] = color[B];
-    vertex->color[A] = color[A];
+    glm_vec4_copy(color, vertex->color);
 }
 
 void vertex_set_texcoords(Vertex* vertex, vec2 texcoords) {
-    vertex->texcoords[U] = texcoords[U];
-    vertex->texcoords[V] = texcoords[V];
+    glm_vec2_copy(texcoords, vertex->texcoords);
 }
 
 void vertex_create(Vertex* vertex, vec2 position, vec4 color, vec2 texcoords) {

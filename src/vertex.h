@@ -1,6 +1,7 @@
 #ifndef VERTEX_H
 #define VERTEX_H
 
+#include <CGLM/glm/vec2.h>
 #include <CGLM/glm/vec4.h>
 
 #define SQUARE_VERTICES 4
