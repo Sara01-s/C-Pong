@@ -14,7 +14,8 @@
             "utils.h": "c",
             "mat4.h": "c",
             "vector": "c",
-            "vec3.h": "c"
+            "vec3.h": "c",
+            "game_object.C": "cpp"
         }
     }
 }
