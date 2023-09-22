@@ -57,9 +57,6 @@ def compile_file(file_path: str, debug = False) -> int:
         get_dir(f'{OBJ_DIR}/{file_name_no_extension}.o'),
     ]
     
-    if debug: log_info('DEBUG BUILD\n', c_yellow)
-    else:     log_info('RELEASE BUILD\n', c_green)
-
     log_info(f'Compiling {file_path}...')
     log_cmd(' '.join(compile_command))
 
@@ -86,7 +83,7 @@ def link_file(obj_file_path) -> bool:
     for lib in libraries:
         link_command.append(f'-l{lib}')
 
-    log_info(f'Linking {obj_file_path}...')
+    log_info(f'Linking {obj_file_path}/**/*.o...')
     log_cmd(' '.join(link_command))
 
     link_result = subprocess.call(link_command)
@@ -125,6 +122,9 @@ def main():
            return
        
     src_files = glob.glob(f'{SRC_DIR}/**/*.c', recursive=True)
+
+    if args.debug: log_info('DEBUG BUILD\n', c_yellow)
+    else:          log_info('RELEASE BUILD\n', c_green)
 
     # Compile
     for src_file in src_files:
