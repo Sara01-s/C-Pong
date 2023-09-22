@@ -3,6 +3,8 @@
 
 #include <CGLM/glm/vec4.h>
 
+#define SQUARE_VERTICES 4
+
 typedef struct {
     vec2 position;
     vec3 color;

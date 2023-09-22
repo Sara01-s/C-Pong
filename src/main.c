@@ -11,10 +11,16 @@
 
 const unsigned long long MAX_VERTICES = 1024ULL; /* 1 kilo byte */
 
+vec2 player_1_position;
+vec2 player_2_position;
 
 void process_input(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE)) {
         glfwSetWindowShouldClose(window, true);
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_UP)) {
+        log_info("PRESIONANDO ARRIBA");
     }
 }
 
@@ -41,7 +47,6 @@ int main(void) {
         fprintf(stderr, "Failed to initialize GLEW\n");
         return -1;
     }
-    
     
     /* Static Data*/
     float circle_vertices[] = {
@@ -79,7 +84,7 @@ int main(void) {
     GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, squares_index_buffer));
     GL_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(square_indices_draw_order), square_indices_draw_order, GL_DYNAMIC_DRAW));
 
-    /* attrib pointer args: location, number of things, type of the things, normalied?, size of each vertex, offset of the property inside the vertex (starting at 0) */
+    /* attrib pointer args: location, number of things, type of the things, normalized?, size of each vertex, offset of the property inside the vertex (starting at 0) */
     GL_CALL(glEnableVertexAttribArray(0));
     GL_CALL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, position)));
 
@@ -138,20 +143,31 @@ int main(void) {
     GL_CALL(glEnable(GL_BLEND));
     GL_CALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
+    double current_frame_time   = glfwGetTime();
+    double delta_time           = 0.0;
+    double last_frame_time      = 0.0;
+
     /* Game loop */
     while (!glfwWindowShouldClose(window)) {
 
         process_input(window);
 
+        current_frame_time  = glfwGetTime();
+        delta_time          = current_frame_time - last_frame_time;
+        last_frame_time     = current_frame_time;
+
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT));
 
+        glm_vec2_add(player_1_position, (vec2) { delta_time, 0.0f }, player_1_position);
+
         /* Dinamically set vertex buffer data */
-        Vertex* square_verts_player_1 = vertex_square_create((vec2) { -14.0f, 0.0f }, 1.0);
+        /* Squares */
+        Vertex* square_verts_player_1 = vertex_square_create(player_1_position, 1.0);
         Vertex* square_verts_player_2 = vertex_square_create((vec2) {  13.0f, 0.0f }, 1.0);
         Vertex all_squares_vertices[8];
 
-        memcpy(all_squares_vertices, square_verts_player_1, 4 * sizeof(Vertex));
-        memcpy(all_squares_vertices + 4, square_verts_player_2, 4 * sizeof(Vertex));
+        memcpy(all_squares_vertices, square_verts_player_1, SQUARE_VERTICES * sizeof(Vertex));
+        memcpy(all_squares_vertices + SQUARE_VERTICES, square_verts_player_2, SQUARE_VERTICES * sizeof(Vertex));
 
         free(square_verts_player_1);
         free(square_verts_player_2);
@@ -163,6 +179,7 @@ int main(void) {
         shader_set_uniform_mat4(squares_shader, "u_MVP", mvp_matrix);
         GL_CALL(glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0));
 
+        /* Circle */
         GL_CALL(glBindVertexArray(circle_vertex_array));
         GL_CALL(glUseProgram(circle_shader));
         shader_set_uniform_mat4(circle_shader, "u_MVP", mvp_matrix);
