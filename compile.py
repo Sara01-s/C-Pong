@@ -70,11 +70,14 @@ def compile_file(file_path: str, debug = False) -> int:
     
     return True
 
-def link_file(obj_file_path: str) -> bool:
+def link_file(obj_file_path) -> bool:
+    print(obj_file_path)
+
+    obj_files = glob.glob(f'{OBJ_DIR}/**/*.o', recursive=True)
 
     link_command = [
         'gcc',
-        obj_file_path,
+        *obj_files,
         '-o',
         APP_NAME,
         f'-L{get_dir(LIB_DIR)}',
@@ -121,8 +124,6 @@ def main():
            os.remove(obj_file)
            return
        
-       
-
     src_files = glob.glob(f'{SRC_DIR}/**/*.c', recursive=True)
 
     # Compile
@@ -134,12 +135,10 @@ def main():
     log_info('Compilation succeed.\n', c_green)
 
     # Link
-    obj_files = glob.glob(f'{OBJ_DIR}/**/*.o', recursive=True)
+    linked_sucessfully = link_file(get_dir(OBJ_DIR))
 
-    for obj_file in obj_files:
-        linked_sucessfully = link_file(obj_file)
-        if not linked_sucessfully:
-            return
+    if not linked_sucessfully:
+        return
 
     log_info('Linking succeed.', c_green)
 

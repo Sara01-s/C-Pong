@@ -9,7 +9,12 @@
             "*.cpp": "cpp",
             "glfw3.h": "c",
             "glew.h": "c",
-            "functional": "c"
+            "functional": "c",
+            "cam.h": "c",
+            "utils.h": "c",
+            "mat4.h": "c",
+            "vector": "c",
+            "vec3.h": "c"
         }
     }
 }
