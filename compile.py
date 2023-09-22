@@ -119,8 +119,10 @@ def main():
         for obj_file in obj_files:
            log_info(f'Deleting {obj_file}.')
            os.remove(obj_file)
-           return
+
+        return
        
+
     src_files = glob.glob(f'{SRC_DIR}/**/*.c', recursive=True)
 
     if args.debug: log_info('DEBUG BUILD\n', c_yellow)
