@@ -1,59 +1,19 @@
-#include <GL/glew.h>
-#include <stdio.h>
-#include <CGLM/glm/cam.h>
 #include <CGLM/glm/struct.h>
-#include <stdbool.h>
+#include <CGLM/glm/cam.h>
 #include <string.h>
 
 #include "utils.h"
 #include "shader.h"
 #include "vertex.h"
+#include "input.h"
 
 const unsigned long long MAX_VERTICES = 1024ULL; /* 1 kilo byte */
 
-vec2 player_1_input_direction   = GLM_VEC2_ZERO_INIT;
-vec2 player_1_position          = GLM_VEC2_ZERO_INIT;
+vec2 player_1_position = (vec2) { -14.0f, 0.0f };
+vec2 player_2_position = (vec2) {  13.0f, 0.0f };
 
-vec2 player_2_input_direction   = GLM_VEC2_ZERO_INIT;
-vec2 player_2_position          = GLM_VEC2_ZERO_INIT;
-
-void process_input(GLFWwindow* window, double delta_time) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE)) {
-        glfwSetWindowShouldClose(window, true);
-    }
-
-    /* player 1 input */
-    bool is_up_1 = false;
-    if ((is_up_1 = glfwGetKey(window, GLFW_KEY_W)) || (is_up_1 != glfwGetKey(window, GLFW_KEY_S))) {
-        float increment = is_up_1 ? 0.1f : -0.1f;
-
-        player_1_input_direction[1] += increment;
-        glm_vec2_clamp(player_1_input_direction, -1.0f, 1.0f);
-
-        printf("p1 y: %.1f\n", player_1_input_direction[1]);
-    }
-    else
-        player_1_input_direction[1] = 0.0f;
-
-    vec2 player_1_input_direction_delta;
-    glm_vec2_scale(player_1_input_direction, delta_time, player_1_input_direction_delta);
-    glm_vec2_addadd(player_1_position, player_1_input_direction_delta, player_1_position);
-
-
-    /* player 2 input */
-    bool is_up_2 = false;
-    if ((is_up_2 = glfwGetKey(window, GLFW_KEY_UP)) || (is_up_2 != glfwGetKey(window, GLFW_KEY_DOWN))) {
-        float increment = is_up_2 ? 0.1f : -0.1f;
-
-        player_2_input_direction[1] += increment;
-        glm_vec2_clamp(player_2_input_direction, -1.0f, 1.0f);
-        printf("p2 y: %.1f\n", player_2_input_direction[1]);
-    }
-    else
-        player_2_input_direction[1] = 0.0f;
-
-
-}
+float player_1_speed = 20.0f;
+float player_2_speed = 20.0f;
 
 int main(void) {
 
@@ -82,6 +42,10 @@ int main(void) {
         fprintf(stderr, "Failed to initialize GLEW\n");
         return -1;
     }
+    
+    GL_CALL(glClearColor(0.0667f, 0.0f, 0.0902f, 1.0f));
+    GL_CALL(glEnable(GL_BLEND));
+    GL_CALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
     
     /* Static Data*/
     float circle_vertices[] = {
@@ -122,6 +86,10 @@ int main(void) {
     /* attrib pointer args: location, number of things, type of the things, normalized?, size of each vertex, offset of the property inside the vertex (starting at 0) */
     GL_CALL(glEnableVertexAttribArray(0));
     GL_CALL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, position)));
+    GL_CALL(glEnableVertexAttribArray(1));
+    GL_CALL(glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, color)));
+    GL_CALL(glEnableVertexAttribArray(2));
+    GL_CALL(glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, texcoords)));
 
     /* Circle settings */
     GLuint circle_vertex_array;
@@ -163,43 +131,52 @@ int main(void) {
     mat4 view_matrix;
     glm_mat4_identity(view_matrix);
 
-    mat4 model_view_matrix;
-    glm_mat4_identity(model_view_matrix);
-
     mat4 projection_matrix;
     glm_mat4_identity(projection_matrix);
     glm_ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f, projection_matrix);
 
     mat4 mvp_matrix;
-    glm_mat4_mul(model_matrix, view_matrix, model_view_matrix);
-    glm_mat4_mul(model_view_matrix, projection_matrix, mvp_matrix);
-
-    GL_CALL(glClearColor(0.2f, 0.3f, 0.8f, 1.0f));
-    GL_CALL(glEnable(GL_BLEND));
-    GL_CALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+    glm_mat4_mul(model_matrix, view_matrix, view_matrix);
+    glm_mat4_mul(view_matrix, projection_matrix, mvp_matrix);
 
     double current_frame_time   = glfwGetTime();
     double delta_time           = 0.0;
     double last_frame_time      = 0.0;
 
+    vec4 squares_color = { 0.5412f, 0.3059f, 0.7922, 1.0f };
 
     /* Game loop */
     while (!glfwWindowShouldClose(window)) {
         
+        input_check_quit(window);
+
         /* Time update */
         current_frame_time  = glfwGetTime();
         delta_time          = current_frame_time - last_frame_time;
         last_frame_time     = current_frame_time;
 
-        process_input(window, delta_time);
-
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT));
 
+        float p1_vertical_axis = input_get_vertical(window, P1);
+        player_1_position[1] += p1_vertical_axis * player_1_speed * delta_time;
+
+        float p2_vertical_axis = input_get_vertical(window, P2);
+        player_2_position[1] += p2_vertical_axis * player_2_speed * delta_time;
 
         /* Dinamically set vertex buffer data */
         /* Squares */
-        Vertex* square_verts_player_1 = vertex_square_create(player_1_position, 1.0);
-        Vertex* square_verts_player_2 = vertex_square_create((vec2) {  13.0f, 0.0f }, 1.0);
+        Vertex* square_verts_player_1 = vertex_square_create (
+            player_1_position, 
+            (vec2) { 0.8f, 4.0f },
+            squares_color
+        );
+
+        Vertex* square_verts_player_2 = vertex_square_create(
+            player_2_position, 
+            (vec2) { 0.8f, 4.0f },
+            squares_color
+        );
+
         Vertex all_squares_vertices[8];
 
         memcpy(all_squares_vertices, square_verts_player_1, SQUARE_VERTICES * sizeof(Vertex));

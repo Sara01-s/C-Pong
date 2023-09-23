@@ -15,8 +15,11 @@
             "mat4.h": "c",
             "vector": "c",
             "vec3.h": "c",
-            "game_object.C": "cpp",
-            "vec2.h": "c"
+            "vec2.h": "c",
+            "input.h": "c",
+            "struct.h": "c",
+            "vertex.h": "c",
+            "string.h": "c"
         }
     }
 }
