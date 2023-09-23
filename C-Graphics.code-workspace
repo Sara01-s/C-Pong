@@ -19,7 +19,11 @@
             "input.h": "c",
             "struct.h": "c",
             "vertex.h": "c",
-            "string.h": "c"
+            "string.h": "c",
+            "vec2-ext.h": "c",
+            "util.h": "c",
+            "cglm.h": "c",
+            "shader.h": "c"
         }
     }
 }

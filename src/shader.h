@@ -2,9 +2,9 @@
 #define SHADER_H
 
 #include "utils.h"
-#include <CGLM/glm/mat4.h>
-#include <CGLM/glm/vec3.h>
-#include <CGLM/glm/vec4.h>
+#include <CGLM/include/cglm/mat4.h>
+#include <CGLM/include/cglm/vec3.h>
+#include <CGLM/include/cglm/vec4.h>
 
 GLuint shader_create(GLenum shader_type, const char* source);
 GLuint shader_compile(GLuint vert_shader, GLuint frag_shader);

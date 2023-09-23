@@ -1,5 +1,5 @@
-#include <CGLM/glm/struct.h>
-#include <CGLM/glm/cam.h>
+#include <CGLM/include/cglm/struct.h>
+#include <CGLM/include/cglm/cam.h>
 #include <string.h>
 
 #include "utils.h"

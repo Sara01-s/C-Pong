@@ -1,7 +1,7 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-#include <CGLM/glm/vec2.h>
+#include <CGLM/include/cglm/vec2.h>
 #include <GLFW/glfw3.h>
 
 #define KEY_QUIT_APP        GLFW_KEY_ESCAPE
