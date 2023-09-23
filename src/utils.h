@@ -7,8 +7,8 @@
 #include <assert.h>
 #include <stdbool.h>
 
-#define log_info(message) printf("[INFO] %s\n", message);
-#define log_error(message) printf("[ERROR] %s\n", message);
+#define log_info(message) printf("[INFO] %s\n", message)
+#define log_error(message) printf("[ERROR] %s\n", message)
 
 /* use for debugging OpenGL errors, comment if not used */
 #define DEBUG_OPENGL

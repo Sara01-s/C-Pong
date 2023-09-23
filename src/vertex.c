@@ -33,7 +33,7 @@ void vertex_create(Vertex* vertex, vec2 position, vec4 color, vec2 texcoords) {
 /* Don't forget to free() the created vertex */
 Vertex* vertex_square_create(vec2 origin_position, vec2 scale, vec4 color) {
 
-    Vertex* square_vertices = malloc(4 * sizeof(Vertex));
+    Vertex* square_vertices = malloc(SQUARE_VERTICES * sizeof(Vertex));
 
     assert(square_vertices != NULL);
 
@@ -43,6 +43,11 @@ Vertex* vertex_square_create(vec2 origin_position, vec2 scale, vec4 color) {
         vertex_set_color(&square_vertices[2], color);
         vertex_set_color(&square_vertices[3], color);
     }
+
+    vertex_set_texcoords(&square_vertices[0], (vec2) { 0.0f, 0.0f });
+    vertex_set_texcoords(&square_vertices[1], (vec2) { 1.0f, 0.0f });
+    vertex_set_texcoords(&square_vertices[2], (vec2) { 1.0f, 1.0f });
+    vertex_set_texcoords(&square_vertices[3], (vec2) { 0.0f, 1.0f });
 
     vertex_set_position(&square_vertices[0], (vec2) { origin_position[X],            origin_position[Y]            });
     vertex_set_position(&square_vertices[1], (vec2) { origin_position[X] + scale[X], origin_position[Y]            });
