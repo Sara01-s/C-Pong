@@ -9,7 +9,7 @@
                 "-I${workspaceFolder}\\deps\\include",
                 "-fdiagnostics-color=always",
                 "-g",
-                "${workspaceFolder}/src/main.c",
+                "${workspaceFolder}/src/**/*.c",
                 "-o",
                 "-L${workspaceFolder}\\deps\\libs",
                 "l${workspaceFolder}\\deps\\libs\\glew32",

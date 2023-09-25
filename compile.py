@@ -31,6 +31,7 @@ def log_error(message: str):
 APP_NAME    = 'game'
 SRC_DIR     = 'src'
 OBJ_DIR     = 'obj'
+CFLAGS      = '-Wall'
 INC_DIR     = 'deps/include'
 LIB_DIR     = 'deps/libs'
 

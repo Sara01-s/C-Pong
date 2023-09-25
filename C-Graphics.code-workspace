@@ -23,7 +23,9 @@
             "vec2-ext.h": "c",
             "util.h": "c",
             "cglm.h": "c",
-            "shader.h": "c"
+            "shader.h": "c",
+            "node.h": "c",
+            "vec4.h": "c"
         }
     }
 }

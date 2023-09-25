@@ -1,16 +1,5 @@
 #include "vertex.h"
-#include <assert.h>
-
-#define X 0
-#define Y 1
-#define Z 2
-#define W 3
-#define R X
-#define G Y
-#define B Z
-#define A W
-#define U X
-#define V Y
+#include "utils.h"
 
 void vertex_set_position(Vertex* vertex, vec2 position) {
     glm_vec2_copy(position, vertex->position);

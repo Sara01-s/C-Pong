@@ -2,7 +2,8 @@
     "files.associations": {
         "*.cpp": "cpp",
         "glfw3.h": "c",
-        "glew.h": "c"
+        "glew.h": "c",
+        "io.h": "c"
     },
     "python.analysis.typeCheckingMode": "basic"
 }

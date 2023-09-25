@@ -7,6 +7,18 @@
 #include <assert.h>
 #include <stdbool.h>
 
+/* to better represent vector, colors, texcoords element access */
+#define X 0
+#define Y 1
+#define Z 2
+#define W 3
+#define R X
+#define G Y
+#define B Z
+#define A W
+#define U X
+#define V Y
+
 #define log_info(message) printf("[INFO] %s\n", message)
 #define log_error(message) printf("[ERROR] %s\n", message)
 
@@ -25,7 +37,5 @@
 bool GLLogCall(const char* function_name, const char* file, int line);
 
 const char* read_file(const char* glsl_file_path);
-
-
 
 #endif // UTILS_H

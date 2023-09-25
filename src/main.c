@@ -1,27 +1,45 @@
 #include <CGLM/include/cglm/struct.h>
 #include <CGLM/include/cglm/cam.h>
+#include <CGLM/include/cglm/io.h>
 #include <string.h>
 
 #include "utils.h"
 #include "shader.h"
 #include "vertex.h"
 #include "input.h"
+#include "node.h"
+#include "collider.h"
 
 const unsigned long long MAX_VERTICES = 1024ULL; /* 1 kilo byte */
-
-vec2 ball_position  = GLM_VEC2_ONE_INIT;
-vec2 ball_direction = GLM_VEC2_ONE_INIT;
-
-vec2 player_1_position = (vec2) { -14.0f, 0.0f };
-vec2 player_2_position = (vec2) {  13.0f, 0.0f };
-
-vec2 player_1_scale = (vec2) { 0.8f, 4.0f };
-vec2 player_2_scale = (vec2) { 0.8f, 4.0f };
 
 float player_1_speed = 20.0f;
 float player_2_speed = 20.0f;
 
 int main(void) {
+    
+    Node* player_1 = node_create (
+        (vec2) { -14.0f, 0.0f },
+        (vec2) { 0.8f, 4.0f },
+        (vec2[2]) { { 0.0f, 0.0f }, { 1.0f, 1.0f } },
+        (vec2) { 0.0f, 0.0f },
+        (vec4) { 0.5412f, 0.3059f, 0.7922f, 1.0f }
+    );
+
+    Node* player_2 = node_create (
+        (vec2) {  13.0f, 0.0f },
+        (vec2) { 0.8f, 4.0f },
+        (vec2[2]) { { 0.0f, 0.0f }, { 1.0f, 1.0f } },
+        (vec2) { 0.0f, 0.0f },
+        (vec4) { 0.5412f, 0.3059f, 0.7922f, 1.0f }
+    );
+
+    Node* ball = node_create (
+        (vec2) { 0.0f, 0.0f },
+        (vec2) { 1.0f, 1.0f },
+        (vec2[2]) { { 0.0f, 0.0f }, { 1.0f, 1.0f } },
+        (vec2) { 0.0f, 0.0f },
+        (vec4) { 0.7725f, 0.1490f, 0.4705f, 1.0f }
+    );
 
     log_info("Running game...");
 
@@ -48,6 +66,8 @@ int main(void) {
         fprintf(stderr, "Failed to initialize GLEW\n");
         return -1;
     }
+
+    
     
     GL_CALL(glClearColor(0.0667f, 0.0f, 0.0902f, 1.0f));
     GL_CALL(glEnable(GL_BLEND));
@@ -143,9 +163,6 @@ int main(void) {
     double delta_time           = 0.0;
     double last_frame_time      = 0.0;
 
-    vec4 square_color = { 0.5412f, 0.3059f, 0.7922f, 1.0f };
-    vec4 circle_color = { 0.7725f, 0.1490f, 0.4705f, 1.0f };
-
     /* Game loop */
     while (!glfwWindowShouldClose(window)) {
         
@@ -159,23 +176,23 @@ int main(void) {
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT));
 
         float p1_vertical_axis = input_get_vertical(window, P1);
-        player_1_position[1] += p1_vertical_axis * player_1_speed * delta_time;
+        player_1->position[1] += p1_vertical_axis * player_1_speed * delta_time;
 
         float p2_vertical_axis = input_get_vertical(window, P2);
-        player_2_position[1] += p2_vertical_axis * player_2_speed * delta_time;
+        player_2->position[1] += p2_vertical_axis * player_2_speed * delta_time;
 
         /* Squares */
         /* Dinamically set square vertices buffer data */
         Vertex* square_verts_player_1 = vertex_square_create (
-            player_1_position, 
-            player_1_scale,
-            square_color
+            player_1->position, 
+            player_1->scale,
+            player_1->color
         );
 
         Vertex* square_verts_player_2 = vertex_square_create (
-            player_2_position, 
-            player_2_scale,
-            square_color
+            player_2->position, 
+            player_2->scale,
+            player_2->color
         );
 
         Vertex all_squares_vertices[8];
@@ -194,14 +211,17 @@ int main(void) {
         GL_CALL(glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0));
 
         /* Circle */
-        /* Dinamically set circle vertices buffer data */
+        ball->position[0] += 5*delta_time;
+        ball->position[1] = sin(current_frame_time * 10.0f) / 2.0f;
 
-        ball_position[1] = sin(current_frame_time * 2.0f) / 2.0f;
+        bool a = collider_check(ball->collider, player_2->collider);
+        collider_follow_position(ball->collider, ball->position);
+        printf("%d\n", a);
 
         Vertex* circle_verts = vertex_square_create (
-            ball_position, 
-            (vec2) GLM_VEC2_ONE_INIT,
-            circle_color
+            ball->position, 
+            ball->scale,
+            ball->color
         );
 
         Vertex circle_square[4];
@@ -224,6 +244,9 @@ int main(void) {
 
     free((void*) squares_vertex_src);
     free((void*) squares_fragmt_src);
+    free(player_1);
+    free(player_2);
+    free(ball);
 
     log_info("Game closed, Bye bye.");
     return 0;
