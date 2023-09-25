@@ -39,7 +39,7 @@ libraries = ['glew32', 'glfw3dll', 'opengl32', 'gdi32']
 
 def compile_file(file_path: str, debug = False) -> int:
     build_mode = '-g' if debug else '-O1'
-    file_name_no_dir       = file_path.split('\\')[-1]
+    file_name_no_dir       = file_path.split(os.path.sep)[-1]
     file_name_dot_index    = file_name_no_dir.find('.')
     file_name_no_extension = file_name_no_dir[:file_name_dot_index] if file_name_dot_index != 1 else file_name_no_dir
 
