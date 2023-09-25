@@ -163,6 +163,17 @@ int main(void) {
     double delta_time           = 0.0;
     double last_frame_time      = 0.0;
 
+    printf("ball collider x1: %.f\n", ball->collider[0][0]);
+    printf("ball collider y1: %.f\n", ball->collider[0][1]);
+    printf("ball collider x2: %.f\n", ball->collider[1][0]);
+    printf("ball collider y2: %.f\n", ball->collider[1][1]);
+    printf("%c", '\n');
+    printf("player 2 collider x1: %.f\n", player_2->collider[0][0]);
+    printf("player 2 collider y1: %.f\n", player_2->collider[0][1]);
+    printf("player 2 collider x2: %.f\n", player_2->collider[1][0]);
+    printf("player 2 collider y2: %.f\n", player_2->collider[1][1]);
+
+
     /* Game loop */
     while (!glfwWindowShouldClose(window)) {
         
@@ -211,12 +222,19 @@ int main(void) {
         GL_CALL(glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0));
 
         /* Circle */
-        ball->position[0] += 5*delta_time;
+        ball->position[0] += 3.5f * delta_time;
         ball->position[1] = sin(current_frame_time * 10.0f) / 2.0f;
 
         bool a = collider_check(ball->collider, player_2->collider);
         collider_follow_position(ball->collider, ball->position);
-        printf("%d\n", a);
+        vec3 xd;
+        vec3 ball_collider_x_1_in_3D = { ball->collider[0][0], ball->collider[0][1], 0.0f };
+        glm_mat4_mulv3(mvp_matrix, ball_collider_x_1_in_3D, 0.0f, xd);
+        //printf("ball collider x1: %.1f\n", ball->collider[0][0]);
+
+        printf("ball collider x1: %.1f\n", xd[0]);
+
+        //printf("collision: %d\n", a);
 
         Vertex* circle_verts = vertex_square_create (
             ball->position, 
