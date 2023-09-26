@@ -3,7 +3,8 @@
         "*.cpp": "cpp",
         "glfw3.h": "c",
         "glew.h": "c",
-        "io.h": "c"
+        "io.h": "c",
+        "collider.h": "c"
     },
     "python.analysis.typeCheckingMode": "basic"
 }
