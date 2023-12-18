@@ -23,5 +23,6 @@ extern enum PLAYER P2;
 
 void  input_check_quit(GLFWwindow* window);
 float input_get_vertical(GLFWwindow* window, enum PLAYER player);
+float input_get_horizontal(GLFWwindow* window, enum PLAYER player);
 
 #endif /* INPUT_H */

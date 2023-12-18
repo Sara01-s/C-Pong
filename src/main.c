@@ -15,6 +15,9 @@ const unsigned long long MAX_VERTICES = 1024ULL; /* 1 kilo byte */
 float player_1_speed = 20.0f;
 float player_2_speed = 20.0f;
 
+vec2  ball_direction = { 1.0f, 0.0f };
+float ball_speed     = 20.0f;
+
 int main(void) {
     
     Node* player_1 = node_create (
@@ -175,13 +178,17 @@ int main(void) {
 
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT));
 
+
+        /* Squares */
         float p1_vertical_axis = input_get_vertical(window, P1);
         player_1->position[1] += p1_vertical_axis * player_1_speed * delta_time;
 
         float p2_vertical_axis = input_get_vertical(window, P2);
         player_2->position[1] += p2_vertical_axis * player_2_speed * delta_time;
 
-        /* Squares */
+        collider_follow_position(player_1->collider, player_1->position);
+        collider_follow_position(player_2->collider, player_2->position);
+
         /* Dinamically set square vertices buffer data */
         Vertex* square_verts_player_1 = vertex_square_create (
             player_1->position, 
@@ -210,13 +217,24 @@ int main(void) {
         shader_set_uniform_mat4(squares_shader, "u_MVP", mvp_matrix);
         GL_CALL(glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0));
 
-        /* Circle */
-        ball->position[0] += 5*delta_time;
-        ball->position[1] = sin(current_frame_time * 10.0f) / 2.0f;
 
-        bool a = collider_check(ball->collider, player_2->collider);
+        /* Circle */
         collider_follow_position(ball->collider, ball->position);
-        printf("%d\n", a);
+        bool ball_p1_collision = collider_check_stay(ball->collider, player_1->collider);
+        bool ball_p2_collision = collider_check_stay(ball->collider, player_2->collider);
+
+        glm_vec2_scale(ball_direction, ball_speed * delta_time, ball->velocity);
+        glm_vec2_add(ball->position, ball->velocity, ball->position);
+
+        if (ball_p1_collision) {
+            ball_direction[0] = 1;
+            ball_direction[1] = 0;
+        }
+        else if (ball_p2_collision) {
+            ball_direction[0] = -1;
+            ball_direction[1] = 0;
+        }
+
 
         Vertex* circle_verts = vertex_square_create (
             ball->position, 
