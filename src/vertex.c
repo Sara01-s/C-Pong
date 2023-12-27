@@ -13,7 +13,7 @@ void vertex_set_texcoords(Vertex* vertex, vec2 texcoords) {
     glm_vec2_copy(texcoords, vertex->texcoords);
 }
 
-void vertex_create(Vertex* vertex, vec2 position, vec4 color, vec2 texcoords) {
+void vertex_configure(Vertex* vertex, vec2 position, vec4 color, vec2 texcoords) {
     vertex_set_position(vertex, position);
     vertex_set_color(vertex, color);
     vertex_set_texcoords(vertex, texcoords);

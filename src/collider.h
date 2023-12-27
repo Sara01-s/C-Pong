@@ -4,8 +4,17 @@
 #include <stdbool.h>
 #include <CGLM/include/cglm/vec2.h>
 
+typedef struct collider {
+    vec2 position;
+    vec2 scale;
+    vec2 lh_vector;
+    vec2 rh_vector;
+} Collider;
+
 /* aabb collision 2D */
-bool collider_check_stay(vec2 collider[2], vec2 other[2]);
-void collider_follow_position(vec2 collider[2], vec2 target_position);
+/* Don't forget to free() colliders :) */
+Collider* collider_create(vec2 position, vec2 scale);
+bool collider_check_stay(Collider collider, Collider other);
+void collider_follow_position(Collider* collider, vec2 target_position);
 
 #endif /* COLLIDER_H */

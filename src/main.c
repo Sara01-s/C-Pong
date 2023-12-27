@@ -16,22 +16,24 @@ float player_1_speed = 20.0f;
 float player_2_speed = 20.0f;
 
 vec2  ball_direction = { 1.0f, 0.0f };
-float ball_speed     = 20.0f;
+float ball_speed     = 10.0f;
 
 int main(void) {
-    
+
+    log_info("Creating nodes...");
+
     Node* player_1 = node_create (
         (vec2) { -14.0f, 0.0f },
         (vec2) { 0.8f, 4.0f },
-        (vec2[2]) { { 0.0f, 0.0f }, { 1.0f, 1.0f } },
+        collider_create((vec2) { -14.0f, 0.0f }, (vec2) { 0.8f, 4.0f }),
         (vec2) { 0.0f, 0.0f },
         (vec4) { 0.5412f, 0.3059f, 0.7922f, 1.0f }
     );
 
     Node* player_2 = node_create (
-        (vec2) {  13.0f, 0.0f },
+        (vec2) { 13.0f, 0.0f },
         (vec2) { 0.8f, 4.0f },
-        (vec2[2]) { { 0.0f, 0.0f }, { 1.0f, 1.0f } },
+        collider_create((vec2) { 13.0f, 0.0f }, (vec2) { 0.8f, 4.0f }),
         (vec2) { 0.0f, 0.0f },
         (vec4) { 0.5412f, 0.3059f, 0.7922f, 1.0f }
     );
@@ -39,12 +41,12 @@ int main(void) {
     Node* ball = node_create (
         (vec2) { 0.0f, 0.0f },
         (vec2) { 1.0f, 1.0f },
-        (vec2[2]) { { 0.0f, 0.0f }, { 1.0f, 1.0f } },
+        collider_create((vec2) { 0.0f, 0.0f }, (vec2) { 1.0f, 1.0f }),
         (vec2) { 0.0f, 0.0f },
         (vec4) { 0.7725f, 0.1490f, 0.4705f, 1.0f }
     );
 
-    log_info("Running game...");
+    log_info("Initializing graphics...");
 
     /* Graphics initialization */
     GLFWwindow* window;
@@ -70,8 +72,6 @@ int main(void) {
         return -1;
     }
 
-    
-    
     GL_CALL(glClearColor(0.0667f, 0.0f, 0.0902f, 1.0f));
     GL_CALL(glEnable(GL_BLEND));
     GL_CALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
@@ -88,6 +88,7 @@ int main(void) {
         0, 1, 2,
         2, 3, 0
     };
+
 
     /* Squares settings */
     GLuint square_vertex_array;
@@ -159,12 +160,14 @@ int main(void) {
     glm_ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f, projection_matrix);
 
     mat4 mvp_matrix;
-    glm_mat4_mul(model_matrix, view_matrix, view_matrix);
-    glm_mat4_mul(view_matrix, projection_matrix, mvp_matrix);
+    glm_mat4_mul(model_matrix, view_matrix, mvp_matrix);
+    glm_mat4_mul(mvp_matrix, projection_matrix, mvp_matrix);
 
     double current_frame_time   = glfwGetTime();
     double delta_time           = 0.0;
     double last_frame_time      = 0.0;
+
+    log_info("Running game...");
 
     /* Game loop */
     while (!glfwWindowShouldClose(window)) {
@@ -179,7 +182,7 @@ int main(void) {
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT));
 
 
-        /* Squares */
+        /* Players */
         float p1_vertical_axis = input_get_vertical(window, P1);
         player_1->position[1] += p1_vertical_axis * player_1_speed * delta_time;
 
@@ -218,13 +221,15 @@ int main(void) {
         GL_CALL(glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0));
 
 
-        /* Circle */
-        collider_follow_position(ball->collider, ball->position);
-        bool ball_p1_collision = collider_check_stay(ball->collider, player_1->collider);
-        bool ball_p2_collision = collider_check_stay(ball->collider, player_2->collider);
-
+        /* Ball */
         glm_vec2_scale(ball_direction, ball_speed * delta_time, ball->velocity);
         glm_vec2_add(ball->position, ball->velocity, ball->position);
+
+        collider_follow_position(ball->collider, ball->position);
+        bool ball_p1_collision = collider_check_stay(*ball->collider, *player_1->collider);
+        bool ball_p2_collision = collider_check_stay(*ball->collider, *player_2->collider);
+
+        printf("%d", ball_p2_collision);
 
         if (ball_p1_collision) {
             ball_direction[0] = 1;
@@ -259,9 +264,15 @@ int main(void) {
     }
 
     glfwTerminate();
+    glDeleteBuffers(1, &squares_vertex_buffer);
+    glDeleteBuffers(1, &squares_index_buffer);
+    glDeleteBuffers(1, &circle_vertex_buffer);
+    glDeleteBuffers(1, &circle_index_buffer);
 
     free((void*) squares_vertex_src);
     free((void*) squares_fragmt_src);
+    free(player_1->collider);
+    free(player_2->collider);
     free(player_1);
     free(player_2);
     free(ball);
