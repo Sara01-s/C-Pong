@@ -48,3 +48,8 @@ Collider node_get_collider(Node* node) {
 float* node_get_velocity(Node* node) {
     return node->velocity;
 }
+
+void node_dispose(Node* node) {
+    free(node->collider);
+    free(node);
+}

@@ -26,4 +26,6 @@ Collider node_get_collider (Node* node);
 float* node_get_velocity   (Node* node);
 //float* node_get_color     (Node* node);
 
+void node_dispose(Node* node);
+
 #endif /* NODE_H */
