@@ -7,14 +7,14 @@
 
 #define SQUARE_VERTICES 4
 
-typedef struct {
+typedef struct vertex {
     vec2 position;
     vec4 color;
     vec2 texcoords;
 } Vertex;
 
 GLuint vb_create(const void* data, GLuint size, bool auto_bind);
-void vb_set_data(const void* data, GLuint size);
+void vb_set_sub_data(const void* data, GLsizeiptr size);
 void vb_bind(GLuint vb_id);
 void vb_unbind(GLuint vb_id);
 void vb_dispose(GLuint vb_id);

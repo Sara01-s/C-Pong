@@ -71,10 +71,10 @@ int main(void) {
         return -1;
     }
 
+    renderer_set_clearcolor(0.0667f, 0.0f, 0.0902f, 1.0f);
     GL_CALL(glEnable(GL_BLEND));
     GL_CALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
-    renderer_set_clearcolor(0.0667f, 0.0f, 0.0902f, 1.0f);
 
     /* Squares and colliders settings */
     GLuint square_indices_draw_order[] = {
@@ -95,30 +95,30 @@ int main(void) {
     GLuint ib_squares = ib_create(square_indices_draw_order, 1, true);
 
     /* attrib pointer args: location (used in shaders), number of things, type of the things, normalized?, size of each vertex, offset of the property inside the vertex (starting at 0) */
-    GL_CALL(glEnableVertexAttribArray(0));
     GL_CALL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, position)));
-    GL_CALL(glEnableVertexAttribArray(1));
+    GL_CALL(glEnableVertexAttribArray(0));
     GL_CALL(glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, color)));
-    GL_CALL(glEnableVertexAttribArray(2));
+    GL_CALL(glEnableVertexAttribArray(1));
     GL_CALL(glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, texcoords)));
+    GL_CALL(glEnableVertexAttribArray(2));
 
     /* Circle settings */
     GLuint vao_circle = vao_create(true);
     GLuint vb_circle = vb_create(0x0, MAX_VERTICES * sizeof(Vertex), true);
     GLuint ib_circle = ib_create(circle_indices_draw_order, 1, true);
 
-    GL_CALL(glEnableVertexAttribArray(0));
     GL_CALL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, position)));
-    GL_CALL(glEnableVertexAttribArray(1));
+    GL_CALL(glEnableVertexAttribArray(0));
     GL_CALL(glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, color)));
-    GL_CALL(glEnableVertexAttribArray(2));
+    GL_CALL(glEnableVertexAttribArray(1));
     GL_CALL(glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, texcoords)));
+    GL_CALL(glEnableVertexAttribArray(2));
 
     /* Shaders setup */
     GLuint squares_shader = shader_create_from_file("assets/vsh_square.glsl", "assets/fsh_square.glsl");
     GLuint circle_shader = shader_create_from_file("assets/vsh_circle.glsl", "assets/fsh_circle.glsl");
 
-    /* Space Setup */
+    /* Space Setup */ 
     mat4 model_matrix;
     glm_mat4_identity(model_matrix);
 
@@ -127,15 +127,14 @@ int main(void) {
 
     mat4 projection_matrix;
     glm_mat4_identity(projection_matrix);
-    glm_ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f, projection_matrix);
+    glm_ortho(-16.0f, 16.0f, -9.0f, 9.0f, -10.0f, 10.0f, projection_matrix);
 
     mat4 mvp_matrix;
-    glm_mat4_mul(projection_matrix, view_matrix, mvp_matrix);
-    glm_mat4_mul(mvp_matrix, model_matrix, mvp_matrix);
-
-    double current_frame_time   = glfwGetTime();
-    double delta_time           = 0.0;
-    double last_frame_time      = 0.0;
+    glm_mat4_mul(model_matrix, view_matrix, mvp_matrix);
+    glm_mat4_mul(mvp_matrix, projection_matrix, mvp_matrix);
+    double current_frame_time = glfwGetTime();
+    double delta_time         = 0.0;
+    double last_frame_time    = 0.0;
 
     log_info("Running game...");
 
@@ -156,9 +155,6 @@ int main(void) {
 
         float p2_vertical_axis = input_get_vertical(window, P2);
         player_2->position[1] += p2_vertical_axis * player_2_speed * delta_time;
-
-        collider_follow_position(player_1->collider, player_1->position);
-        collider_follow_position(player_2->collider, player_2->position);
 
         /* Dinamically set square vertices buffer data */
         Vertex* square_verts_player_1 = vertex_square_create (
@@ -183,7 +179,7 @@ int main(void) {
 
         vao_bind(vao_squares);
         vb_bind(vb_squares);
-        vb_set_data(all_squares_vertices, sizeof(all_squares_vertices));
+        vb_set_sub_data(all_squares_vertices, sizeof(all_squares_vertices));
         shader_bind(squares_shader);
         shader_set_uniform_mat4(squares_shader, "u_MVP", mvp_matrix);
         GL_CALL(glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0));
@@ -192,22 +188,6 @@ int main(void) {
         /* Ball */
         glm_vec2_scale(ball_direction, ball_speed * delta_time, ball->velocity);
         glm_vec2_add(ball->position, ball->velocity, ball->position);
-
-        collider_follow_position(ball->collider, ball->position);
-        bool ball_p1_collision = collider_check_stay(*ball->collider, *player_1->collider);
-        bool ball_p2_collision = collider_check_stay(*ball->collider, *player_2->collider);
-
-        printf("%d", ball_p2_collision);
-
-        if (ball_p1_collision) {
-            ball_direction[0] = 1;
-            ball_direction[1] = 0;
-        }
-        else if (ball_p2_collision) {
-            ball_direction[0] = -1;
-            ball_direction[1] = 0;
-        }
-
 
         Vertex* circle_verts = vertex_square_create (
             ball->position, 
@@ -222,7 +202,7 @@ int main(void) {
 
         vao_bind(vao_circle);
         vb_bind(vb_circle);
-        vb_set_data(circle_square, sizeof(circle_square));
+        vb_set_sub_data(circle_square, sizeof(circle_square));
         shader_bind(circle_shader);
         shader_set_uniform_mat4(circle_shader, "u_MVP", mvp_matrix);
         GL_CALL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
