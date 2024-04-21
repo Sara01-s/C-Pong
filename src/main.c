@@ -19,7 +19,7 @@ float ball_speed     = 10.0f;
 
 int main(void) {
 
-    log_info("Creating entitys...");
+    log_info("Creating entities...");
 
     Entity* player_1 = entity_create (
         (vec2) { -14.0f, 0.0f },
