@@ -24,7 +24,7 @@
             "util.h": "c",
             "cglm.h": "c",
             "shader.h": "c",
-            "node.h": "c",
+            "entity.h": "c",
             "vec4.h": "c",
             "stdbool.h": "c",
             "types-struct.h": "c",

@@ -6,7 +6,7 @@
 #include "utils.h"
 #include "render/renderer.h"
 #include "game/input.h"
-#include "game/node.h"
+#include "game/entity.h"
 #include "game/collider.h"
 
 const unsigned long long MAX_VERTICES = 1024ULL; /* 1kb */
@@ -19,9 +19,9 @@ float ball_speed     = 10.0f;
 
 int main(void) {
 
-    log_info("Creating nodes...");
+    log_info("Creating entitys...");
 
-    Node* player_1 = node_create (
+    Entity* player_1 = entity_create (
         (vec2) { -14.0f, 0.0f },
         (vec2) { 0.8f, 4.0f },
         collider_create((vec2) { -14.0f, 0.0f }, (vec2) { 0.8f, 4.0f }),
@@ -29,7 +29,7 @@ int main(void) {
         (vec4) { 0.5412f, 0.3059f, 0.7922f, 1.0f }
     );
 
-    Node* player_2 = node_create (
+    Entity* player_2 = entity_create (
         (vec2) { 13.0f, 0.0f },
         (vec2) { 0.8f, 4.0f },
         collider_create((vec2) { 13.0f, 0.0f }, (vec2) { 0.8f, 4.0f }),
@@ -37,7 +37,7 @@ int main(void) {
         (vec4) { 0.5412f, 0.3059f, 0.7922f, 1.0f }
     );
 
-    Node* ball = node_create (
+    Entity* ball = entity_create (
         (vec2) { 0.0f, 0.0f },
         (vec2) { 1.0f, 1.0f },
         collider_create((vec2) { 0.0f, 0.0f }, (vec2) { 1.0f, 1.0f }),
@@ -218,8 +218,8 @@ int main(void) {
     ib_dispose(ib_squares);
     ib_dispose(ib_circle);
 
-    node_dispose(player_1);
-    node_dispose(player_2);
+    entity_dispose(player_1);
+    entity_dispose(player_2);
 
     free(ball);
 
