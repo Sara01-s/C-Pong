@@ -97,12 +97,9 @@ int main(void) {
     GLuint ib_squares = ib_create(square_indices_draw_order, ib_squares_length, true);
 
     /* attrib pointer args: location (used in shaders), number of things, type of the things, normalized?, size of each vertex, offset of the property inside the vertex (starting at 0) */
-    GL_CALL(glEnableVertexAttribArray(0));
-    GL_CALL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, position)));
-    GL_CALL(glEnableVertexAttribArray(1));
-    GL_CALL(glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, color)));
-    GL_CALL(glEnableVertexAttribArray(2));
-    GL_CALL(glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, texcoords)));
+    vao_add_attrib(GL_FLOAT, 2, sizeof(Vertex), (void*) offsetof(Vertex, position));
+    vao_add_attrib(GL_FLOAT, 4, sizeof(Vertex), (void*) offsetof(Vertex, color));
+    vao_add_attrib(GL_FLOAT, 2, sizeof(Vertex), (void*) offsetof(Vertex, texcoords));
 
     /* Circle settings */
     GLuint vao_circle = vao_create(true);
@@ -110,12 +107,9 @@ int main(void) {
     GLuint ib_circle_length = sizeof(circle_indices_draw_order) / sizeof(circle_indices_draw_order[0]);
     GLuint ib_circle = ib_create(circle_indices_draw_order, ib_circle_length, true);
 
-    GL_CALL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, position)));
-    GL_CALL(glEnableVertexAttribArray(0));
-    GL_CALL(glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, color)));
-    GL_CALL(glEnableVertexAttribArray(1));
-    GL_CALL(glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, texcoords)));
-    GL_CALL(glEnableVertexAttribArray(2));
+    vao_add_attrib(GL_FLOAT, 2, sizeof(Vertex), (void*) offsetof(Vertex, position));
+    vao_add_attrib(GL_FLOAT, 4, sizeof(Vertex), (void*) offsetof(Vertex, color));
+    vao_add_attrib(GL_FLOAT, 2, sizeof(Vertex), (void*) offsetof(Vertex, texcoords));
 
     /* Shaders setup */
     GLuint squares_shader = shader_create_from_file("assets/vsh_square.glsl", "assets/fsh_square.glsl");
@@ -135,6 +129,7 @@ int main(void) {
     mat4 mvp_matrix;
     glm_mat4_mul(model_matrix, view_matrix, mvp_matrix);
     glm_mat4_mul(mvp_matrix, projection_matrix, mvp_matrix);
+
     double current_frame_time = glfwGetTime();
     double delta_time         = 0.0;
     double last_frame_time    = 0.0;
