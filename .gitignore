@@ -1,0 +1,5 @@
+# .o files
+obj/
+
+# vscode files
+.vscode/
