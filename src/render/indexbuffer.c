@@ -9,11 +9,11 @@ void ib_unbind(GLuint ib_id) {
 	GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 }
 
-GLuint ib_create(const GLuint* data, GLuint count, bool auto_bind) {
+GLuint ib_create(const GLuint* data, GLuint indices_count, bool auto_bind) {
     GLuint ib_id;
     GL_CALL(glGenBuffers(1, &ib_id));
     ib_bind(ib_id);
-	GL_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(GLuint), data, GL_DYNAMIC_DRAW));
+	GL_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_count * sizeof(GLuint), data, GL_DYNAMIC_DRAW));
 
     if (!auto_bind) {
         ib_unbind(ib_id);

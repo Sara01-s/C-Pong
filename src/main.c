@@ -90,22 +90,25 @@ int main(void) {
         2, 3, 0
     };
 
+    /* Squares settings */
     GLuint vao_squares = vao_create(true);
     GLuint vb_squares = vb_create(0x0, MAX_VERTICES * sizeof(Vertex), true); /* 0x0 in data because we want to modify it in runtime */
-    GLuint ib_squares = ib_create(square_indices_draw_order, 1, true);
+    GLuint ib_squares_length = sizeof(square_indices_draw_order) / sizeof(square_indices_draw_order[0]);
+    GLuint ib_squares = ib_create(square_indices_draw_order, ib_squares_length, true);
 
     /* attrib pointer args: location (used in shaders), number of things, type of the things, normalized?, size of each vertex, offset of the property inside the vertex (starting at 0) */
-    GL_CALL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, position)));
     GL_CALL(glEnableVertexAttribArray(0));
-    GL_CALL(glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, color)));
+    GL_CALL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, position)));
     GL_CALL(glEnableVertexAttribArray(1));
-    GL_CALL(glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, texcoords)));
+    GL_CALL(glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, color)));
     GL_CALL(glEnableVertexAttribArray(2));
+    GL_CALL(glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, texcoords)));
 
     /* Circle settings */
     GLuint vao_circle = vao_create(true);
     GLuint vb_circle = vb_create(0x0, MAX_VERTICES * sizeof(Vertex), true);
-    GLuint ib_circle = ib_create(circle_indices_draw_order, 1, true);
+    GLuint ib_circle_length = sizeof(circle_indices_draw_order) / sizeof(circle_indices_draw_order[0]);
+    GLuint ib_circle = ib_create(circle_indices_draw_order, ib_circle_length, true);
 
     GL_CALL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, position)));
     GL_CALL(glEnableVertexAttribArray(0));

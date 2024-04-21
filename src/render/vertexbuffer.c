@@ -8,7 +8,7 @@ void vb_unbind(GLuint vb_id) {
     GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
 }
 
-GLuint vb_create(const void* data, GLuint size, bool auto_bind) {
+GLuint vb_create(const void* data, GLsizeiptr size, bool auto_bind) {
     GLuint vb_id;
     GL_CALL(glGenBuffers(1, &vb_id));
     vb_bind(vb_id);

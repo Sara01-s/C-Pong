@@ -13,7 +13,7 @@ typedef struct vertex {
     vec2 texcoords;
 } Vertex;
 
-GLuint vb_create(const void* data, GLuint size, bool auto_bind);
+GLuint vb_create(const void* data, GLsizeiptr size, bool auto_bind);
 void vb_set_sub_data(const void* data, GLsizeiptr size);
 void vb_bind(GLuint vb_id);
 void vb_unbind(GLuint vb_id);
