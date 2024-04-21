@@ -44,7 +44,7 @@ float input_get_vertical(GLFWwindow* window, enum PLAYER player) {
         return player_1_axes.vertical_axis;
     }
     else if (player == PLAYER_2) {
-        input_get_axis(window, &player_2_axes, KEY_PLAYER_2_UP, KEY_PLAYER_2_DOWN, KEY_PLAYER_1_LEFT, KEY_PLAYER_1_RIGHT);
+        input_get_axis(window, &player_2_axes, KEY_PLAYER_2_UP, KEY_PLAYER_2_DOWN, KEY_PLAYER_2_LEFT, KEY_PLAYER_2_RIGHT);
         return player_2_axes.vertical_axis;
     }
 
@@ -57,7 +57,7 @@ float input_get_horizontal(GLFWwindow* window, enum PLAYER player) {
         return player_1_axes.horizontal_axis;
     }
     else if (player == PLAYER_2) {
-        input_get_axis(window, &player_2_axes, KEY_PLAYER_2_UP, KEY_PLAYER_2_DOWN, KEY_PLAYER_1_LEFT, KEY_PLAYER_1_RIGHT);
+        input_get_axis(window, &player_2_axes, KEY_PLAYER_2_UP, KEY_PLAYER_2_DOWN, KEY_PLAYER_2_LEFT, KEY_PLAYER_2_RIGHT);
         return player_2_axes.horizontal_axis;
     }
 

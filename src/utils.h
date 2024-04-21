@@ -36,6 +36,6 @@
 
 bool GLLogCall(const char* function_name, const char* file, int line);
 
-const char* read_file(const char* glsl_file_path);
+const char* read_file(const char* filepath);
 
 #endif // UTILS_H

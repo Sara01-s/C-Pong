@@ -1,5 +1,5 @@
 #include "collider.h"
-#include "utils.h"
+#include "../utils.h"
 
 Collider* collider_create(vec2 position, vec2 scale) {
     Collider* collider = malloc(sizeof(Collider));

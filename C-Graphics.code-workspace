@@ -27,7 +27,13 @@
             "node.h": "c",
             "vec4.h": "c",
             "stdbool.h": "c",
-            "types-struct.h": "c"
+            "types-struct.h": "c",
+            "*.tcc": "cpp",
+            "istream": "cpp",
+            "renderer.h": "c",
+            "vertexbuffer.h": "c",
+            "vertexarray.h": "c",
+            "system_error": "c"
         }
     }
 }
