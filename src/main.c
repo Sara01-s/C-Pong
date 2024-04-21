@@ -1,15 +1,15 @@
 #include <CGLM/include/cglm/struct.h>
-#include <CGLM/include/cglm/cam.h>
-#include <CGLM/include/cglm/io.h>
-#include <string.h>
 
 #include "utils.h"
+
 #include "render/renderer.h"
+#include "render/primitives/rect.h"
+
 #include "game/input.h"
 #include "game/entity.h"
 #include "game/collider.h"
 
-const unsigned long long MAX_VERTICES = 1024ULL; /* 1kb */
+const unsigned long long MAX_GAME_VERTICES = 1024ULL; /* 1kb */
 
 float player_1_speed = 20.0f;
 float player_2_speed = 20.0f;
@@ -19,20 +19,25 @@ float ball_speed     = 10.0f;
 
 int main(void) {
 
+    /* Graphics initialization */
+    log_info("Initializing graphics...");
+
+    GLFWwindow* window = renderer_window_create(MAX_GAME_VERTICES);
+    renderer_set_clearcolor(0.0667f, 0.0f, 0.0902f, 1.0f);
+
+    /* Entities initialization */
     log_info("Creating entities...");
 
     Entity* player_1 = entity_create (
         (vec2) { -14.0f, 0.0f },
         (vec2) { 0.8f, 4.0f },
-        collider_create((vec2) { -14.0f, 0.0f }, (vec2) { 0.8f, 4.0f }),
         (vec2) { 0.0f, 0.0f },
         (vec4) { 0.5412f, 0.3059f, 0.7922f, 1.0f }
     );
-
+        
     Entity* player_2 = entity_create (
         (vec2) { 13.0f, 0.0f },
         (vec2) { 0.8f, 4.0f },
-        collider_create((vec2) { 13.0f, 0.0f }, (vec2) { 0.8f, 4.0f }),
         (vec2) { 0.0f, 0.0f },
         (vec4) { 0.5412f, 0.3059f, 0.7922f, 1.0f }
     );
@@ -40,103 +45,34 @@ int main(void) {
     Entity* ball = entity_create (
         (vec2) { 0.0f, 0.0f },
         (vec2) { 1.0f, 1.0f },
-        collider_create((vec2) { 0.0f, 0.0f }, (vec2) { 1.0f, 1.0f }),
         (vec2) { 0.0f, 0.0f },
         (vec4) { 0.7725f, 0.1490f, 0.4705f, 1.0f }
     );
 
-    log_info("Initializing graphics...");
-
-    /* Graphics initialization */
-    GLFWwindow* window;
-
-    if (!glfwInit())
-        return -1;
-
-    window = glfwCreateWindow(1280, 720, "Mi primer jueguito en C", NULL, NULL);
-    if (!window) {
-        glfwTerminate();
-        return -1;
-    }
-
-    glfwSwapInterval(1);    /* 1 means VSync */
-    glfwMakeContextCurrent(window);
-    int screen_width = 0;
-    int screen_height = 0;
-    glfwGetMonitorWorkarea(glfwGetPrimaryMonitor(), NULL, NULL, &screen_width, &screen_height);
-    glfwSetWindowPos(window, screen_width / 6, screen_height / 6);
-
-    if (glewInit() != GLEW_OK) {
-        fprintf(stderr, "Failed to initialize GLEW\n");
-        return -1;
-    }
-
-    renderer_set_clearcolor(0.0667f, 0.0f, 0.0902f, 1.0f);
-    GL_CALL(glEnable(GL_BLEND));
-    GL_CALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-
-
-    /* Squares and colliders settings */
-    GLuint square_indices_draw_order[] = {
-        0, 1, 2,
-        2, 3, 0,
-
-        4, 5, 6,
-        6, 7, 4
-    };
-
-    GLuint circle_indices_draw_order[] = {
-        0, 1, 2,
-        2, 3, 0
-    };
-
-    /* Squares settings */
-    GLuint vao_squares = vao_create(true);
-    GLuint vb_squares = vb_create(0x0, MAX_VERTICES * sizeof(Vertex), true); /* 0x0 in data because we want to modify it in runtime */
-    GLuint ib_squares_length = sizeof(square_indices_draw_order) / sizeof(square_indices_draw_order[0]);
-    GLuint ib_squares = ib_create(square_indices_draw_order, ib_squares_length, true);
-
-    /* attrib pointer args: location (used in shaders), number of things, type of the things, normalized?, size of each vertex, offset of the property inside the vertex (starting at 0) */
-    vao_add_attrib(GL_FLOAT, 2, sizeof(Vertex), (void*) offsetof(Vertex, position));
-    vao_add_attrib(GL_FLOAT, 4, sizeof(Vertex), (void*) offsetof(Vertex, color));
-    vao_add_attrib(GL_FLOAT, 2, sizeof(Vertex), (void*) offsetof(Vertex, texcoords));
-
-    /* Circle settings */
-    GLuint vao_circle = vao_create(true);
-    GLuint vb_circle = vb_create(0x0, MAX_VERTICES * sizeof(Vertex), true);
-    GLuint ib_circle_length = sizeof(circle_indices_draw_order) / sizeof(circle_indices_draw_order[0]);
-    GLuint ib_circle = ib_create(circle_indices_draw_order, ib_circle_length, true);
-
-    vao_add_attrib(GL_FLOAT, 2, sizeof(Vertex), (void*) offsetof(Vertex, position));
-    vao_add_attrib(GL_FLOAT, 4, sizeof(Vertex), (void*) offsetof(Vertex, color));
-    vao_add_attrib(GL_FLOAT, 2, sizeof(Vertex), (void*) offsetof(Vertex, texcoords));
-
-    /* Shaders setup */
-    GLuint squares_shader = shader_create_from_file("assets/vsh_square.glsl", "assets/fsh_square.glsl");
+    entity_set_collider(player_1, collider_create(player_1->position, player_1->scale));
+    entity_set_collider(player_2, collider_create(player_2->position, player_2->scale));
+    entity_set_collider(ball, collider_create(ball->position, ball->scale));
+    
+    /* Graphics setup */
+    GLuint rect_shader = shader_create_from_file("assets/vsh_rect.glsl", "assets/fsh_rect.glsl");
     GLuint circle_shader = shader_create_from_file("assets/vsh_circle.glsl", "assets/fsh_circle.glsl");
 
+    entity_set_rect(player_1, rect_create(rect_shader));
+    entity_set_rect(player_2, rect_create(rect_shader));
+    entity_set_rect(ball, rect_create(circle_shader));
+
     /* Space Setup */ 
-    mat4 model_matrix;
-    glm_mat4_identity(model_matrix);
-
-    mat4 view_matrix;
-    glm_mat4_identity(view_matrix);
-
-    mat4 projection_matrix;
-    glm_mat4_identity(projection_matrix);
-    glm_ortho(-16.0f, 16.0f, -9.0f, 9.0f, -10.0f, 10.0f, projection_matrix);
-
     mat4 mvp_matrix;
-    glm_mat4_mul(model_matrix, view_matrix, mvp_matrix);
-    glm_mat4_mul(mvp_matrix, projection_matrix, mvp_matrix);
+    renderer_config_mvp_matrix(&mvp_matrix);
 
+    /* Time Setup */
     double current_frame_time = glfwGetTime();
     double delta_time         = 0.0;
     double last_frame_time    = 0.0;
 
+    /* Game loop */
     log_info("Running game...");
 
-    /* Game loop */
     while (!glfwWindowShouldClose(window)) {
         
         input_check_quit(window);
@@ -154,74 +90,24 @@ int main(void) {
         float p2_vertical_axis = input_get_vertical(window, P2);
         player_2->position[1] += p2_vertical_axis * player_2_speed * delta_time;
 
-        /* Dinamically set square vertices buffer data */
-        Vertex* square_verts_player_1 = vertex_square_create (
-            player_1->position, 
-            player_1->scale,
-            player_1->color
-        );
-
-        Vertex* square_verts_player_2 = vertex_square_create (
-            player_2->position, 
-            player_2->scale,
-            player_2->color
-        );
-
-        Vertex all_squares_vertices[8];
-
-        memcpy(all_squares_vertices, square_verts_player_1, SQUARE_VERTICES * sizeof(Vertex));
-        memcpy(all_squares_vertices + SQUARE_VERTICES, square_verts_player_2, SQUARE_VERTICES * sizeof(Vertex));
-
-        free(square_verts_player_1);
-        free(square_verts_player_2);
-
-        vao_bind(vao_squares);
-        vb_bind(vb_squares);
-        vb_set_sub_data(all_squares_vertices, sizeof(all_squares_vertices));
-        shader_bind(squares_shader);
-        shader_set_uniform_mat4(squares_shader, "u_MVP", mvp_matrix);
-        GL_CALL(glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0));
-
+        renderer_draw_entity(player_1, mvp_matrix);
+        renderer_draw_entity(player_2, mvp_matrix);
 
         /* Ball */
         glm_vec2_scale(ball_direction, ball_speed * delta_time, ball->velocity);
         glm_vec2_add(ball->position, ball->velocity, ball->position);
 
-        Vertex* circle_verts = vertex_square_create (
-            ball->position, 
-            ball->scale,
-            ball->color
-        );
-
-        Vertex circle_square[4];
-        memcpy(circle_square, circle_verts, SQUARE_VERTICES * sizeof(Vertex));
-
-        free(circle_verts);
-
-        vao_bind(vao_circle);
-        vb_bind(vb_circle);
-        vb_set_sub_data(circle_square, sizeof(circle_square));
-        shader_bind(circle_shader);
-        shader_set_uniform_mat4(circle_shader, "u_MVP", mvp_matrix);
-        GL_CALL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
+        renderer_draw_entity(ball, mvp_matrix);
         
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
     glfwTerminate();
-    
-    vao_dispose(vao_squares);
-    vao_dispose(vao_circle);
-    vb_dispose(vb_squares);
-    vb_dispose(vb_circle);
-    ib_dispose(ib_squares);
-    ib_dispose(ib_circle);
 
     entity_dispose(player_1);
     entity_dispose(player_2);
-
-    free(ball);
+    entity_dispose(ball);
 
     printf("%s", "\n");
     log_info("Game closed, Bye bye.");

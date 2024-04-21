@@ -18,5 +18,6 @@ void   shader_set_uniform_vec3(GLuint shader_id, const char* property_name, vec3
 void   shader_set_uniform_vec4(GLuint shader_id, const char* property_name, vec4 vector);
 
 GLint  shader_get_uniform_loc(GLuint shader_id, const char* property_name);
+void   shader_dispose(GLuint shader_id);
 
 #endif /* SHADER_H */

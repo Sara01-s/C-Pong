@@ -1,12 +1,11 @@
 #include <string.h>
 #include "entity.h"
 
-Entity* entity_create(vec2 position, vec2 scale, Collider* collider, vec2 velocity, vec4 color) {
+Entity* entity_create(vec2 position, vec2 scale, vec2 velocity, vec4 color) {
 
     Entity* entity = malloc(sizeof(Entity));
     glm_vec2_copy(position, entity->position);
     glm_vec2_copy(scale, entity->scale);
-    entity->collider = collider;
     glm_vec2_copy(velocity, entity->velocity);
     glm_vec4_copy(color, entity->color);
 
@@ -23,6 +22,10 @@ void entity_set_scale(Entity* entity, vec2 scale) {
 
 void entity_set_collider(Entity* entity, Collider* collider) {
     entity->collider = collider;
+}
+
+void entity_set_rect(Entity* entity, Rect* rect) {
+    entity->rect = rect;
 }
 
 void entity_set_velocity(Entity* entity, vec2 velocity) {
@@ -45,11 +48,17 @@ Collider entity_get_collider(Entity* entity) {
     return *entity->collider;
 }
 
+Rect* entity_get_rect(Entity* entity) {
+    return entity->rect;
+}
+
 float* entity_get_velocity(Entity* entity) {
     return entity->velocity;
 }
 
 void entity_dispose(Entity* entity) {
-    free(entity->collider);
+    if (entity->rect != NULL) free(entity->rect);
+    if (entity->collider != NULL) free(entity->collider);
+    
     free(entity);
 }

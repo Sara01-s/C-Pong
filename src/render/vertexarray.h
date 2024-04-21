@@ -9,5 +9,4 @@ void vao_unbind(GLuint vao_id);
 void vao_add_attrib(GLenum element_type, GLint element_count, GLsizei stride, const void* pointer);
 void vao_dispose(GLuint vao_id);
 
-
 #endif /* VERTEXARRAY_H */

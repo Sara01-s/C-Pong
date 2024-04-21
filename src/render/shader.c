@@ -41,27 +41,27 @@ GLuint shader_create_from_file(const char* vsh_filepath, const char* fsh_filepat
 }
 
 GLuint shader_compile(GLuint vert_shader, GLuint frag_shader) {
-    GL_CALL(GLuint shader_program = glCreateProgram());
+    GL_CALL(GLuint shader_program_id = glCreateProgram());
 
-    GL_CALL(glAttachShader(shader_program, vert_shader));
-    GL_CALL(glAttachShader(shader_program, frag_shader));
-    GL_CALL(glLinkProgram(shader_program));
+    GL_CALL(glAttachShader(shader_program_id, vert_shader));
+    GL_CALL(glAttachShader(shader_program_id, frag_shader));
+    GL_CALL(glLinkProgram(shader_program_id));
 
     GLint shader_link_status = 0;
-    GL_CALL(glGetProgramiv(shader_program, GL_LINK_STATUS, &shader_link_status));
+    GL_CALL(glGetProgramiv(shader_program_id, GL_LINK_STATUS, &shader_link_status));
 
     if (shader_link_status == GL_FALSE) {
         GLsizei log_length = 0;
-        GL_CALL(glGetProgramiv(shader_program, GL_INFO_LOG_LENGTH, &log_length));
+        GL_CALL(glGetProgramiv(shader_program_id, GL_INFO_LOG_LENGTH, &log_length));
         GLchar* log_message = (char*) malloc(log_length * sizeof(GLchar));
 
-        GL_CALL(glGetProgramInfoLog(shader_program, log_length, &log_length, log_message));
+        GL_CALL(glGetProgramInfoLog(shader_program_id, log_length, &log_length, log_message));
         log_info(log_message);
 
         free(log_message);
     }
 
-    return shader_program;
+    return shader_program_id;
 }
 
 void shader_bind(GLuint shader_id) {
@@ -117,4 +117,8 @@ void shader_set_uniform_vec4(GLuint shader_id, const char* property_name, vec4 v
 GLint shader_get_uniform_loc(GLuint shader_id, const char* property_name) {
     GL_CALL(GLint location = glGetUniformLocation(shader_id, property_name));
     return location;
+}
+
+void shader_dispose(GLuint shader_id) {
+    GL_CALL(glDeleteProgram(shader_id));
 }
