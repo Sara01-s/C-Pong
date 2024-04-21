@@ -5,13 +5,12 @@ enum PLAYER P1 = PLAYER_1;
 enum PLAYER P2 = PLAYER_2;
 
 typedef struct {
-    float vertical_axis;
-    float horizontal_axis;
+    float vertical;
+    float horizontal;
 } InputAxes;
 
-InputAxes player_1_axes = { 0.0f, 0.0f };
-InputAxes player_2_axes = { 0.0f, 0.0f };
-float input_increment = 0.1f;
+InputAxes playerAxes[2] = { {0.0f, 0.0f}, {0.0f, 0.0f} };
+const float inputIncrement = 0.1f;
 
 void input_check_quit(GLFWwindow* window) {
     if (glfwGetKey(window, KEY_QUIT_APP)) {
@@ -19,47 +18,35 @@ void input_check_quit(GLFWwindow* window) {
     }
 }
 
-void input_get_axis(GLFWwindow* window, InputAxes* axis, int key_up, int key_down, int key_left, int key_right) {
-    if (glfwGetKey(window, key_up))
-        axis->vertical_axis += input_increment;
-    else if (glfwGetKey(window, key_down))
-        axis->vertical_axis -= input_increment;
-    else
-        axis->vertical_axis = 0.0f;
+void input_get_axis(GLFWwindow* window, InputAxes* axes, int keyUp, int keyDown, int keyLeft, int keyRight) {
+    axes->vertical = 0.0f;
+    axes->horizontal = 0.0f;
 
-    if (glfwGetKey(window, key_right))
-        axis->horizontal_axis += input_increment;
-    else if (glfwGetKey(window, key_left))
-        axis->horizontal_axis -= input_increment;
-    else
-        axis->horizontal_axis = 0.0f;
+    if (glfwGetKey(window, keyUp)) axes->vertical += inputIncrement;
+    if (glfwGetKey(window, keyDown)) axes->vertical -= inputIncrement;
+    if (glfwGetKey(window, keyRight)) axes->horizontal += inputIncrement;
+    if (glfwGetKey(window, keyLeft)) axes->horizontal -= inputIncrement;
 
-    axis->vertical_axis   = glm_clamp(axis->vertical_axis, -1.0f, 1.0f);
-    axis->horizontal_axis = glm_clamp(axis->horizontal_axis, -1.0f, 1.0f);
+    axes->vertical = glm_clamp(axes->vertical, -1.0f, 1.0f);
+    axes->horizontal = glm_clamp(axes->horizontal, -1.0f, 1.0f);
 }
 
 float input_get_vertical(GLFWwindow* window, enum PLAYER player) {
-    if (player == PLAYER_1) {
-        input_get_axis(window, &player_1_axes, KEY_PLAYER_1_UP, KEY_PLAYER_1_DOWN, KEY_PLAYER_1_LEFT, KEY_PLAYER_1_RIGHT);
-        return player_1_axes.vertical_axis;
-    }
-    else if (player == PLAYER_2) {
-        input_get_axis(window, &player_2_axes, KEY_PLAYER_2_UP, KEY_PLAYER_2_DOWN, KEY_PLAYER_2_LEFT, KEY_PLAYER_2_RIGHT);
-        return player_2_axes.vertical_axis;
-    }
+    input_get_axis(window, &playerAxes[player], 
+                   player == PLAYER_1 ? KEY_PLAYER_1_UP : KEY_PLAYER_2_UP,
+                   player == PLAYER_1 ? KEY_PLAYER_1_DOWN : KEY_PLAYER_2_DOWN,
+                   player == PLAYER_1 ? KEY_PLAYER_1_LEFT : KEY_PLAYER_2_LEFT,
+                   player == PLAYER_1 ? KEY_PLAYER_1_RIGHT : KEY_PLAYER_2_RIGHT);
 
-    return 0.0f;
+    return playerAxes[player].vertical;
 }
 
 float input_get_horizontal(GLFWwindow* window, enum PLAYER player) {
-    if (player == PLAYER_1) {
-        input_get_axis(window, &player_1_axes, KEY_PLAYER_1_UP, KEY_PLAYER_1_DOWN, KEY_PLAYER_1_LEFT, KEY_PLAYER_1_RIGHT);
-        return player_1_axes.horizontal_axis;
-    }
-    else if (player == PLAYER_2) {
-        input_get_axis(window, &player_2_axes, KEY_PLAYER_2_UP, KEY_PLAYER_2_DOWN, KEY_PLAYER_2_LEFT, KEY_PLAYER_2_RIGHT);
-        return player_2_axes.horizontal_axis;
-    }
+    input_get_axis(window, &playerAxes[player], 
+                   player == PLAYER_1 ? KEY_PLAYER_1_UP : KEY_PLAYER_2_UP,
+                   player == PLAYER_1 ? KEY_PLAYER_1_DOWN : KEY_PLAYER_2_DOWN,
+                   player == PLAYER_1 ? KEY_PLAYER_1_LEFT : KEY_PLAYER_2_LEFT,
+                   player == PLAYER_1 ? KEY_PLAYER_1_RIGHT : KEY_PLAYER_2_RIGHT);
 
-    return 0.0f;
+    return playerAxes[player].horizontal;
 }

@@ -11,8 +11,8 @@
 
 const unsigned long long MAX_GAME_VERTICES = 1024ULL; /* 1kb */
 
-float player_1_speed = 20.0f;
-float player_2_speed = 20.0f;
+float player_1_speed = 100.0f;
+float player_2_speed = 100.0f;
 
 vec2  ball_direction = { 1.0f, 0.0f };
 float ball_speed     = 10.0f;
