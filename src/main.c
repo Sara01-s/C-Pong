@@ -18,8 +18,8 @@ float player_2_speed = 100.0f;
 vec2  ball_direction = { 1.0f, 0.0f };
 float ball_speed     = 10.0f;
 
-void xd() {
-    log_info("xd");
+void ball_bounce() {
+    ball_direction[X] *= -1;
 }
 
 int main(void) {
@@ -102,7 +102,7 @@ int main(void) {
         glm_vec2_scale(ball_direction, ball_speed * delta_time, ball->velocity);
         entity_translate(ball, ball->velocity);
 
-        collider_check(*ball->collider, *player_2->collider, STAY, xd);
+        collider_check(*ball->collider, *player_2->collider, ENTER, ball_bounce);
 
         /* Render */
         renderer_draw_entity(player_1, mvp_matrix);
