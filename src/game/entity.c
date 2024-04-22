@@ -30,6 +30,10 @@ void entity_set_rect(Entity* entity, Rect* rect) {
 
 void entity_translate(Entity* entity, vec2 velocity) {
     glm_vec2_add(entity->position, entity->velocity, entity->position);
+
+    if (entity->collider != NULL) {
+        collider_follow_position(entity->collider, entity->position);
+    }
 }
 
 void entity_set_velocity(Entity* entity, vec2 velocity) {

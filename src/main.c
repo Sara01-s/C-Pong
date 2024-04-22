@@ -18,6 +18,10 @@ float player_2_speed = 100.0f;
 vec2  ball_direction = { 1.0f, 0.0f };
 float ball_speed     = 10.0f;
 
+void xd() {
+    log_info("xd");
+}
+
 int main(void) {
 
     /* Graphics initialization */
@@ -75,9 +79,12 @@ int main(void) {
     log_info("Running game...");
 
     while (!glfwWindowShouldClose(window)) {
-        
-        input_check_quit(window);
         renderer_clear_screen();
+        
+        /* Input */
+        input_check_quit(window);
+        vec2 p1_direction = { 0.0, input_get_vertical(window, P1) };
+        vec2 p2_direction = { 0.0, input_get_vertical(window, P2) };
 
         /* Time update */
         current_frame_time  = glfwGetTime();
@@ -85,23 +92,17 @@ int main(void) {
         last_frame_time     = current_frame_time;
 
         /* Players */
-        float p1_vertical_axis = input_get_vertical(window, P1);
-        player_1->position[1] += p1_vertical_axis * player_1_speed * delta_time;
+        glm_vec2_scale(p1_direction, player_1_speed * delta_time, player_1->velocity);
+        entity_translate(player_1, player_1->velocity);
 
-        float p2_vertical_axis = input_get_vertical(window, P2);
-        player_2->position[1] += p2_vertical_axis * player_2_speed * delta_time;
+        glm_vec2_scale(p2_direction, player_2_speed * delta_time, player_2->velocity);
+        entity_translate(player_2, player_2->velocity);
     
-
         /* Ball */
         glm_vec2_scale(ball_direction, ball_speed * delta_time, ball->velocity);
         entity_translate(ball, ball->velocity);
 
-        collider_follow_position(ball->collider, ball->position);
-
-        if (collider_check_stay(*ball->collider, *player_2->collider)) {
-            log_info("COLISIOOOOOON");
-        }
-
+        collider_check(*ball->collider, *player_2->collider, STAY, xd);
 
         /* Render */
         renderer_draw_entity(player_1, mvp_matrix);

@@ -1,6 +1,12 @@
 #include "collider.h"
 #include "../utils.h"
 
+/*
+    ! IMPORTANT: for now, collider_check_enter/exit can only track 1 entity at a time.
+*/
+
+bool collider_entered = false;
+
 Collider* collider_create(vec2 position, vec2 scale) {
     Collider* collider = malloc(sizeof(Collider));
 
@@ -10,6 +16,36 @@ Collider* collider_create(vec2 position, vec2 scale) {
     glm_vec2_add(collider->position, collider->scale, collider->urh_vector);
 
     return collider;
+}   
+
+void collider_check(Collider collider, Collider other, COLLISION_EVENT event, void (*callback)()) {
+
+    bool enter = collider_check_enter(collider, other);
+    bool stay = collider_check_stay(collider, other);
+    bool exit = collider_check_exit(collider, other);
+
+    switch (event) {
+        case ENTER: if (enter) callback(); break;
+        case STAY:  if (stay)  callback(); break;
+        case EXIT:  if (exit)  callback(); break;
+        default: break;
+    }
+}
+
+bool collider_check_enter(Collider collider, Collider other) {
+    if (collider_entered) return false;
+
+    collider_entered = collider_check_stay(collider, other);
+    return collider_entered;
+}
+
+bool collider_check_exit(Collider collider, Collider other) {
+    if (collider_entered && !collider_check_stay(collider, other)) {
+        collider_entered = false;
+        return true;
+    }
+
+    return false;
 }
 
 bool collider_check_stay(Collider collider, Collider other) {
