@@ -6,8 +6,8 @@ Collider* collider_create(vec2 position, vec2 scale) {
 
     glm_vec2_copy(position, collider->position);
     glm_vec2_copy(scale, collider->scale);
-    glm_vec2_sub(collider->position, collider->scale, collider->lh_vector);
-    glm_vec2_add(collider->position, collider->scale, collider->rh_vector);
+    glm_vec2_sub(collider->position, collider->scale, collider->blh_vector);
+    glm_vec2_add(collider->position, collider->scale, collider->urh_vector);
 
     return collider;
 }
@@ -31,6 +31,14 @@ bool collider_check_stay(Collider collider, Collider other) {
     return collision;
 }
 
+void collider_set_center(Collider* collider, vec2 blh_vector, vec2 uph_vector) {
+    float x = (blh_vector[X] + uph_vector[X]) / 2.0f;
+    float y = (blh_vector[Y] + uph_vector[Y]) / 2.0f;
+
+    collider->position[X] = x;
+    collider->position[Y] = y;
+}
+
 void collider_follow_position(Collider* collider, vec2 target_position) {
 
     float col_width  = collider->scale[X];
@@ -45,8 +53,10 @@ void collider_follow_position(Collider* collider, vec2 target_position) {
     float col_target_x2 = target_x + col_width;
     float col_target_y2 = target_y + col_height;
 
-    collider->lh_vector[X] = col_target_x1;
-    collider->lh_vector[Y] = col_target_y1;
-    collider->rh_vector[X] = col_target_x2;
-    collider->rh_vector[Y] = col_target_y2;
+    collider->blh_vector[X] = col_target_x1;
+    collider->blh_vector[Y] = col_target_y1;
+    collider->urh_vector[X] = col_target_x2;
+    collider->urh_vector[Y] = col_target_y2;
+
+    collider_set_center(collider, collider->blh_vector, collider->urh_vector);
 }

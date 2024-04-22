@@ -23,6 +23,8 @@ void entity_set_color        (Entity* entity, vec4 color);
 void entity_set_collider     (Entity* entity, Collider* collider);
 void entity_set_rect         (Entity* entity, Rect* rect);
 
+void entity_translate(Entity* entity, vec2 velocity);
+
 float* entity_get_position   (Entity* entity);
 float* entity_get_scale      (Entity* entity);
 float* entity_get_velocity   (Entity* entity);

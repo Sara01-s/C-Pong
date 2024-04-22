@@ -1,4 +1,5 @@
 #include <CGLM/include/cglm/struct.h>
+#include <CGLM/include/cglm/io.h>
 
 #include "utils.h"
 
@@ -89,14 +90,22 @@ int main(void) {
 
         float p2_vertical_axis = input_get_vertical(window, P2);
         player_2->position[1] += p2_vertical_axis * player_2_speed * delta_time;
-
-        renderer_draw_entity(player_1, mvp_matrix);
-        renderer_draw_entity(player_2, mvp_matrix);
+    
 
         /* Ball */
         glm_vec2_scale(ball_direction, ball_speed * delta_time, ball->velocity);
-        glm_vec2_add(ball->position, ball->velocity, ball->position);
+        entity_translate(ball, ball->velocity);
 
+        collider_follow_position(ball->collider, ball->position);
+
+        if (collider_check_stay(*ball->collider, *player_2->collider)) {
+            log_info("COLISIOOOOOON");
+        }
+
+
+        /* Render */
+        renderer_draw_entity(player_1, mvp_matrix);
+        renderer_draw_entity(player_2, mvp_matrix);
         renderer_draw_entity(ball, mvp_matrix);
         
         glfwSwapBuffers(window);

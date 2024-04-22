@@ -28,6 +28,10 @@ void entity_set_rect(Entity* entity, Rect* rect) {
     entity->rect = rect;
 }
 
+void entity_translate(Entity* entity, vec2 velocity) {
+    glm_vec2_add(entity->position, entity->velocity, entity->position);
+}
+
 void entity_set_velocity(Entity* entity, vec2 velocity) {
     glm_vec2_copy(velocity, entity->velocity);
 }
@@ -57,7 +61,7 @@ float* entity_get_velocity(Entity* entity) {
 }
 
 void entity_dispose(Entity* entity) {
-    if (entity->rect != NULL) free(entity->rect);
+    if (entity->rect != NULL) rect_dispose(entity->rect);
     if (entity->collider != NULL) free(entity->collider);
     
     free(entity);

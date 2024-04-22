@@ -7,8 +7,8 @@
 typedef struct collider {
     vec2 position;
     vec2 scale;
-    vec2 lh_vector;
-    vec2 rh_vector;
+    vec2 blh_vector;
+    vec2 urh_vector;
 } Collider;
 
 /* aabb collision 2D */
