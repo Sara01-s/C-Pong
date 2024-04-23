@@ -14,7 +14,7 @@ float player_1_speed = 100.0f;
 float player_2_speed = 100.0f;
 
 vec2  ball_direction = { 1.0f, 0.0f };
-float ball_speed     = 7.5f;
+float ball_speed     = 20.0f;
 
 void ball_paddle_bounce(Entity* ball, Entity* paddle) {
     /* src: https://gamedev.stackexchange.com/questions/4253/in-pong-how-do-you-calculate-the-balls-direction-when-it-bounces-off-the-paddl */
@@ -31,6 +31,14 @@ void ball_paddle_bounce(Entity* ball, Entity* paddle) {
     ball_direction[Y] = ball_dir_y;
 
     glm_vec2_normalize(ball_direction);
+}
+
+void ball_top_wall_bounce(Entity* ball, Entity* wall) {
+    ball_direction[Y] = -1;
+}
+
+void ball_bot_wall_bounce(Entity* ball, Entity* wall) {
+    ball_direction[Y] = 1;
 }
 
 int main(void) {
@@ -65,9 +73,25 @@ int main(void) {
         (vec4) { 0.7725f, 0.1490f, 0.4705f, 1.0f }
     );
 
+    Entity* top_wall = entity_create (
+        (vec2) { -16.0f, 8.0f },
+        (vec2) { 40.0f, 1.0f },
+        (vec2) { 0.0f, 0.0f },
+        (vec4) { 0.7725f, 0.1490f, 0.4705f, 1.0f }
+    );
+
+    Entity* bot_wall = entity_create (
+        (vec2) { -16.0f, -9.0f },
+        (vec2) { 40.0f, 1.0f },
+        (vec2) { 0.0f, 0.0f },
+        (vec4) { 0.7725f, 0.1490f, 0.4705f, 1.0f }
+    );
+
     entity_set_collider(player_1, collider_create(player_1->position, player_1->scale));
     entity_set_collider(player_2, collider_create(player_2->position, player_2->scale));
     entity_set_collider(ball, collider_create(ball->position, ball->scale));
+    entity_set_collider(top_wall, collider_create(top_wall->position, top_wall->scale));
+    entity_set_collider(bot_wall, collider_create(bot_wall->position, bot_wall->scale));
     
     /* Graphics setup */
     GLuint rect_shader = shader_create_from_file("assets/vsh_rect.glsl", "assets/fsh_rect.glsl");
@@ -76,6 +100,8 @@ int main(void) {
     entity_set_rect(player_1, rect_create(rect_shader));
     entity_set_rect(player_2, rect_create(rect_shader));
     entity_set_rect(ball, rect_create(circle_shader));
+    entity_set_rect(top_wall, rect_create(rect_shader));
+    entity_set_rect(bot_wall, rect_create(rect_shader));
 
     /* Space Setup */ 
     mat4 mvp_matrix;
@@ -115,11 +141,15 @@ int main(void) {
 
         entity_check_collision(ball, player_1, ENTER, ball_paddle_bounce);
         entity_check_collision(ball, player_2, ENTER, ball_paddle_bounce);
+        entity_check_collision(ball, top_wall, ENTER, ball_top_wall_bounce);
+        entity_check_collision(ball, bot_wall, ENTER, ball_bot_wall_bounce);
 
         /* Render */
         renderer_draw_entity(player_1, mvp_matrix);
         renderer_draw_entity(player_2, mvp_matrix);
         renderer_draw_entity(ball, mvp_matrix);
+        renderer_draw_entity(top_wall, mvp_matrix);
+        renderer_draw_entity(bot_wall, mvp_matrix);
         
         glfwSwapBuffers(window);
         glfwPollEvents();
