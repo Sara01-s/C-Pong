@@ -15,6 +15,8 @@ typedef struct entity {
     Rect* rect;
 } Entity;
 
+typedef void (*CollisionCallback)(Entity* sender, Entity* other);
+
 Entity* entity_create        (vec2 position, vec2 scale, vec2 velocity, vec4 color);
 void entity_set_position     (Entity* entity, vec2 position);
 void entity_set_scale        (Entity* entity, vec2 scale);
@@ -24,6 +26,7 @@ void entity_set_collider     (Entity* entity, Collider* collider);
 void entity_set_rect         (Entity* entity, Rect* rect);
 
 void entity_translate(Entity* entity, vec2 velocity);
+void entity_check_collision(Entity* sender, Entity* other, COLLISION_EVENT event, CollisionCallback callback);
 
 float* entity_get_position   (Entity* entity);
 float* entity_get_scale      (Entity* entity);

@@ -33,7 +33,9 @@
             "renderer.h": "c",
             "vertexbuffer.h": "c",
             "vertexarray.h": "c",
-            "system_error": "c"
+            "system_error": "c",
+            "rect.h": "c",
+            "collider.h": "c"
         }
     }
 }

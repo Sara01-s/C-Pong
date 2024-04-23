@@ -36,6 +36,19 @@ void entity_translate(Entity* entity, vec2 velocity) {
     }
 }
 
+void entity_check_collision(Entity* sender, Entity* other, COLLISION_EVENT event, CollisionCallback callback) {
+    bool enter = collider_check_enter(*sender->collider, *other->collider);
+    bool stay = collider_check_stay(*sender->collider, *other->collider);
+    bool exit = collider_check_exit(*sender->collider, *other->collider);
+
+    switch (event) {
+        case ENTER: if (enter) callback(sender, other); break;
+        case STAY:  if (stay)  callback(sender, other); break;
+        case EXIT:  if (exit)  callback(sender, other); break;
+        default: break;
+    }
+}
+
 void entity_set_velocity(Entity* entity, vec2 velocity) {
     glm_vec2_copy(velocity, entity->velocity);
 }

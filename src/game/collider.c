@@ -1,4 +1,5 @@
 #include "collider.h"
+#include "entity.h"
 #include "../utils.h"
 
 /*
@@ -17,20 +18,6 @@ Collider* collider_create(vec2 position, vec2 scale) {
 
     return collider;
 }   
-
-void collider_check(Collider collider, Collider other, COLLISION_EVENT event, void (*callback)()) {
-
-    bool enter = collider_check_enter(collider, other);
-    bool stay = collider_check_stay(collider, other);
-    bool exit = collider_check_exit(collider, other);
-
-    switch (event) {
-        case ENTER: if (enter) callback(); break;
-        case STAY:  if (stay)  callback(); break;
-        case EXIT:  if (exit)  callback(); break;
-        default: break;
-    }
-}
 
 bool collider_check_enter(Collider collider, Collider other) {
     if (collider_entered) return false;
