@@ -102,6 +102,7 @@ int main(void) {
         glm_vec2_scale(ball_direction, ball_speed * delta_time, ball->velocity);
         entity_translate(ball, ball->velocity);
 
+        collider_check(*ball->collider, *player_1->collider, ENTER, ball_bounce);
         collider_check(*ball->collider, *player_2->collider, ENTER, ball_bounce);
 
         /* Render */
