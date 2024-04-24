@@ -13,8 +13,8 @@ InputAxes playerAxes[2] = { {0.0f, 0.0f}, {0.0f, 0.0f} };
 const float inputIncrement = 0.1f;
 
 void input_check_quit(GLFWwindow* window) {
-    if (glfwGetKey(window, KEY_QUIT_APP)) {
-        glfwSetWindowShouldClose(window, true);
+    if (glfwGetKey(window, KEY_QUIT_APP) == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
 }
 

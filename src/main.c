@@ -1,11 +1,7 @@
 #include <CGLM/include/cglm/struct.h>
-#include <CGLM/include/cglm/io.h>
 
 #include "render/renderer.h"
-#include "render/primitives/rect.h"
-
 #include "game/input.h"
-#include "game/entity.h"
 
 const unsigned long long MAX_GAME_VERTICES = 1024ULL; /* 1kb */
 const float MAX_BOUNCE_ANGLE_RAD = 5.0F * M_PI / 12.0F; /* 75 degrees */
@@ -14,7 +10,7 @@ float player_1_speed = 100.0f;
 float player_2_speed = 100.0f;
 
 vec2  ball_direction = { 1.0f, 0.0f };
-float ball_speed     = 20.0f;
+float ball_speed     = 10.0f;
 
 void ball_paddle_bounce(Entity* ball, Entity* paddle) {
     /* src: https://gamedev.stackexchange.com/questions/4253/in-pong-how-do-you-calculate-the-balls-direction-when-it-bounces-off-the-paddl */
@@ -39,6 +35,20 @@ void ball_top_wall_bounce(Entity* ball, Entity* wall) {
 
 void ball_bot_wall_bounce(Entity* ball, Entity* wall) {
     ball_direction[Y] = 1;
+}
+
+void ball_left_wall_bounce(Entity* ball, Entity* wall) {
+    entity_set_position(ball, (vec2) { 0.0f, 0.0f });
+    ball_direction[X] = 1.0f;
+    ball_direction[Y] = 0.0f;
+    log_info("left point");
+}
+
+void ball_right_wall_bounce(Entity* ball, Entity* wall) {
+    entity_set_position(ball, (vec2) { 0.0f, 0.0f });
+    ball_direction[X] = -1.0f;
+    ball_direction[Y] = 0.0f;
+    log_info("right point");
 }
 
 int main(void) {
@@ -87,11 +97,27 @@ int main(void) {
         (vec4) { 0.7725f, 0.1490f, 0.4705f, 1.0f }
     );
 
+    Entity* right_wall = entity_create (
+        (vec2) { 15.0f, -9.0f },
+        (vec2) { 1.0f, 20.0f },
+        (vec2) { 0.0f, 0.0f },
+        (vec4) { 0.7725f, 0.1490f, 0.4705f, 1.0f }
+    );
+    
+    Entity* left_wall = entity_create (
+        (vec2) { -16.0f, -9.0f },
+        (vec2) { 1.0f, 20.0f },
+        (vec2) { 0.0f, 0.0f },
+        (vec4) { 0.7725f, 0.1490f, 0.4705f, 1.0f }
+    );
+
     entity_set_collider(player_1, collider_create(player_1->position, player_1->scale));
     entity_set_collider(player_2, collider_create(player_2->position, player_2->scale));
     entity_set_collider(ball, collider_create(ball->position, ball->scale));
     entity_set_collider(top_wall, collider_create(top_wall->position, top_wall->scale));
     entity_set_collider(bot_wall, collider_create(bot_wall->position, bot_wall->scale));
+    entity_set_collider(left_wall, collider_create(left_wall->position, left_wall->scale));
+    entity_set_collider(right_wall, collider_create(right_wall->position, right_wall->scale));
     
     /* Graphics setup */
     GLuint rect_shader = shader_create_from_file("assets/vsh_rect.glsl", "assets/fsh_rect.glsl");
@@ -102,6 +128,8 @@ int main(void) {
     entity_set_rect(ball, rect_create(circle_shader));
     entity_set_rect(top_wall, rect_create(rect_shader));
     entity_set_rect(bot_wall, rect_create(rect_shader));
+    entity_set_rect(left_wall, rect_create(rect_shader));
+    entity_set_rect(right_wall, rect_create(rect_shader));
 
     /* Space Setup */ 
     mat4 mvp_matrix;
@@ -143,6 +171,8 @@ int main(void) {
         entity_check_collision(ball, player_2, ENTER, ball_paddle_bounce);
         entity_check_collision(ball, top_wall, ENTER, ball_top_wall_bounce);
         entity_check_collision(ball, bot_wall, ENTER, ball_bot_wall_bounce);
+        entity_check_collision(ball, left_wall, ENTER, ball_left_wall_bounce);
+        entity_check_collision(ball, right_wall, ENTER, ball_right_wall_bounce);
 
         /* Render */
         renderer_draw_entity(player_1, mvp_matrix);
@@ -150,16 +180,23 @@ int main(void) {
         renderer_draw_entity(ball, mvp_matrix);
         renderer_draw_entity(top_wall, mvp_matrix);
         renderer_draw_entity(bot_wall, mvp_matrix);
+        renderer_draw_entity(left_wall, mvp_matrix);
+        renderer_draw_entity(right_wall, mvp_matrix);
         
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    glfwTerminate();
-
     entity_dispose(player_1);
     entity_dispose(player_2);
     entity_dispose(ball);
+    entity_dispose(top_wall);
+    entity_dispose(bot_wall);
+    entity_dispose(left_wall);
+    entity_dispose(right_wall);
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
 
     printf("%s", "\n");
     log_info("Game closed, Bye bye.");

@@ -78,8 +78,13 @@ float* entity_get_velocity(Entity* entity) {
 }
 
 void entity_dispose(Entity* entity) {
-    if (entity->rect != NULL) rect_dispose(entity->rect);
-    if (entity->collider != NULL) free(entity->collider);
+    if (entity->rect != NULL) {
+        rect_dispose(entity->rect);
+    }
+
+    if (entity->collider != NULL) {
+        free(entity->collider);
+    }
     
     free(entity);
 }
